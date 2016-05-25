@@ -30,7 +30,7 @@ android {
     }
     signingConfigs {
         release {
-            storeFile file("keystore.jks")
+            storeFile file(System.getenv("KEYSTORE_PATH"))
             storePassword System.getenv("KEYSTOREPASS")
             keyAlias "keystore"
             keyPassword System.getenv("AESD_KEYPASS")
