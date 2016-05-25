@@ -108,7 +108,7 @@ public class MapFragment extends Fragment {
 
         self = inflater.inflate(R.layout.fragment_map, container, false);
 
-        RelativeLayout relativeLayout = (RelativeLayout)self.findViewById(R.id.map_activity_layout);
+        RelativeLayout relativeLayout = (RelativeLayout)self.findViewById(R.id.map_fragment_layout);
         RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
         tileView = new TileView(getContext());
 

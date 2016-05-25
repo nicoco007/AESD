@@ -22,6 +22,7 @@ import android.os.Bundle;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.view.ViewPager;
+import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
@@ -84,6 +85,7 @@ public class MapActivity extends AesdActivity {
         // register EventBus
         EventBus eventBus = EventBus.getDefault();
         eventBus.register(this);
+
     }
 
     @Override

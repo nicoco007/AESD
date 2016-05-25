@@ -29,7 +29,7 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
         <activity
-            android:name=".activity.MapActivity"
+            android:name=".activity.SplashActivity"
             android:label="@string/app_label"
             android:theme="@style/AppTheme.NoActionBar">
             <intent-filter>
@@ -37,6 +37,11 @@
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
+        </activity>
+        <activity
+            android:name=".activity.MapActivity"
+            android:label="@string/app_label"
+            android:theme="@style/AppTheme.NoActionBar">
         </activity>
         <activity
             android:name=".activity.CountdownActivity"
