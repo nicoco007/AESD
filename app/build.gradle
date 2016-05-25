@@ -28,6 +28,15 @@ android {
         versionCode 3
         versionName "1.0.0"
     }
+    signingConfigs {
+        release {
+            storeFile file("keystore.jks")
+            storePassword System.getenv("KEYSTOREPASS")
+            keyAlias "keystore"
+            keyPassword System.getenv("AESD_KEYPASS")
+        }
+    }
+
     buildTypes {
         release {
             minifyEnabled false
