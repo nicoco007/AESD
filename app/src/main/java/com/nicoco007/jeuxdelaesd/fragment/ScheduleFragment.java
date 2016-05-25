@@ -33,7 +33,7 @@ import com.nicoco007.jeuxdelaesd.Activities;
 import com.nicoco007.jeuxdelaesd.R;
 import com.nicoco007.jeuxdelaesd.adapter.ActivitiesListAdapter;
 import com.nicoco007.jeuxdelaesd.adapter.SimpleSpinnerAdapter;
-import com.nicoco007.jeuxdelaesd.model.AesdDayActivity;
+import com.nicoco007.jeuxdelaesd.model.DayActivity;
 
 import java.text.Collator;
 import java.util.ArrayList;
@@ -45,7 +45,7 @@ public class ScheduleFragment extends Fragment {
 
     private static String TAG = "ScheduleFragment";
 
-    public ScheduleFragment() {}
+    public ScheduleFragment() { }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -95,9 +95,9 @@ public class ScheduleFragment extends Fragment {
                 switch(position) {
                     case 0:
                         Log.i(TAG, "attempting to sort by time");
-                        Collections.sort(Activities.get(getContext()), new Comparator<AesdDayActivity>() {
+                        Collections.sort(Activities.get(getContext()), new Comparator<DayActivity>() {
                             @Override
-                            public int compare(AesdDayActivity a, AesdDayActivity b) {
+                            public int compare(DayActivity a, DayActivity b) {
                                 long startTimeSort = a.getStartTime() - b.getStartTime();
                                 if(startTimeSort != 0) return (int)startTimeSort;
 
@@ -108,9 +108,9 @@ public class ScheduleFragment extends Fragment {
                         break;
 
                     case 1:
-                        Collections.sort(Activities.get(getContext()), new Comparator<AesdDayActivity>() {
+                        Collections.sort(Activities.get(getContext()), new Comparator<DayActivity>() {
                             @Override
-                            public int compare(AesdDayActivity a, AesdDayActivity b) {
+                            public int compare(DayActivity a, DayActivity b) {
                                 Collator collator = Collator.getInstance(Locale.CANADA_FRENCH);
                                 collator.setStrength(Collator.PRIMARY);
                                 return collator.compare(a.getText(), b.getText());

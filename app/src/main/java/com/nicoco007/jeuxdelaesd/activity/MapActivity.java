@@ -22,6 +22,7 @@ import android.os.Bundle;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.view.ViewPager;
+import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
@@ -29,6 +30,7 @@ import android.widget.EditText;
 
 import com.nicoco007.jeuxdelaesd.R;
 import com.nicoco007.jeuxdelaesd.events.ShowMapCoordsEvent;
+import com.nicoco007.jeuxdelaesd.fragment.BuildingsFragment;
 import com.nicoco007.jeuxdelaesd.fragment.MapFragment;
 import com.nicoco007.jeuxdelaesd.fragment.ScheduleFragment;
 import com.nicoco007.jeuxdelaesd.adapter.ViewPagerAdapter;
@@ -54,26 +56,36 @@ public class MapActivity extends AesdActivity {
 
         // get viewpager
         viewPager = (ViewPager)findViewById(R.id.viewpager);
-
-        // create fragments for viewpager
-        Fragment mapFragment = new MapFragment();
-        Fragment scheduleFragment = new ScheduleFragment();
-
-        // create viewpager adapter and add fragments
-        ViewPagerAdapter adapter = new ViewPagerAdapter(getSupportFragmentManager());
-        adapter.addFragment(mapFragment, "Carte");
-        adapter.addFragment(scheduleFragment, "Horaire");
-
-        // set adapter
-        viewPager.setAdapter(adapter);
-
-        // get TabLayout and set it up with ViewPager
         TabLayout tabLayout = (TabLayout)findViewById(R.id.tabs_activities);
-        tabLayout.setupWithViewPager(viewPager);
+
+        if(viewPager != null && tabLayout != null) {
+
+            // create fragments for viewpager
+            Fragment mapFragment = new MapFragment();
+            Fragment scheduleFragment = new ScheduleFragment();
+            Fragment buildingsFragment = new BuildingsFragment();
+
+            // create viewpager adapter and add fragments
+            ViewPagerAdapter adapter = new ViewPagerAdapter(getSupportFragmentManager());
+            adapter.addFragment(mapFragment, "Carte");
+            adapter.addFragment(scheduleFragment, "Horaire");
+            adapter.addFragment(buildingsFragment, "Lieux");
+
+            // set adapter
+            viewPager.setAdapter(adapter);
+
+            // prevent unloading of map
+            viewPager.setOffscreenPageLimit(2);
+
+            // get TabLayout and set it up with ViewPager
+            tabLayout.setupWithViewPager(viewPager);
+
+        }
 
         // register EventBus
         EventBus eventBus = EventBus.getDefault();
         eventBus.register(this);
+
     }
 
     @Override

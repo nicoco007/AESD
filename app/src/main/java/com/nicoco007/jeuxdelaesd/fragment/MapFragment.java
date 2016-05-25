@@ -17,11 +17,8 @@
 package com.nicoco007.jeuxdelaesd.fragment;
 
 import android.Manifest;
-import android.app.ActionBar;
 import android.content.Context;
 import android.content.pm.PackageManager;
-import android.graphics.Paint;
-import android.graphics.Path;
 import android.location.GpsSatellite;
 import android.location.GpsStatus;
 import android.location.Location;
@@ -33,7 +30,6 @@ import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
 import android.util.Log;
-import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -45,26 +41,23 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.nicoco007.jeuxdelaesd.Activities;
+import com.nicoco007.jeuxdelaesd.model.MarkerInfo;
 import com.nicoco007.jeuxdelaesd.Markers;
 import com.nicoco007.jeuxdelaesd.R;
 import com.nicoco007.jeuxdelaesd.events.ShowMapCoordsEvent;
-import com.nicoco007.jeuxdelaesd.model.AesdDayActivity;
+import com.nicoco007.jeuxdelaesd.model.DayActivity;
 import com.nicoco007.jeuxdelaesd.model.Callout;
 import com.nicoco007.jeuxdelaesd.model.CalloutInfo;
-import com.nicoco007.jeuxdelaesd.model.Coordinates;
 import com.nicoco007.jeuxdelaesd.model.Marker;
 import com.nicoco007.jeuxdelaesd.model.MarkerCollection;
 import com.nicoco007.jeuxdelaesd.model.PointD;
 import com.qozix.tileview.TileView;
 import com.qozix.tileview.markers.MarkerLayout;
-import com.qozix.tileview.paths.CompositePathView;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 
 import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
 import java.util.Locale;
 
 public class MapFragment extends Fragment {
@@ -101,6 +94,8 @@ public class MapFragment extends Fragment {
 
     public MapFragment() {
 
+        eventBus.register(this);
+
     }
 
     @Override
@@ -110,11 +105,10 @@ public class MapFragment extends Fragment {
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+
         self = inflater.inflate(R.layout.fragment_map, container, false);
 
-        eventBus.register(this);
-
-        RelativeLayout relativeLayout = (RelativeLayout)self.findViewById(R.id.map_activity_layout);
+        RelativeLayout relativeLayout = (RelativeLayout)self.findViewById(R.id.map_fragment_layout);
         RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
         tileView = new TileView(getContext());
 
@@ -146,7 +140,7 @@ public class MapFragment extends Fragment {
 
                     ArrayList<String> activityNames = new ArrayList<>();
 
-                    for(AesdDayActivity activity : Activities.get(getContext())) {
+                    for(DayActivity activity : Activities.get(getContext())) {
 
                         if(activity.getMarker().latitude == position.y && activity.getMarker().longitude == position.x) {
 
@@ -189,30 +183,46 @@ public class MapFragment extends Fragment {
         tileView.addMarker(currentLocationMarker, 0.5d, 0.5d, -0.5f, -0.5f);
 
         addPin(Markers.ARCHERY);
-        addPin(Markers.BASEBALL_EAST,           "Terrain de balle-molle 2");
+        addPin(Markers.BASEBALL_EAST);
         addPin(Markers.BASEBALL_SOUTH);
-        addPin(Markers.BASEBALL_WEST,           "Terrain de balle-molle 1");
-        addPin(Markers.BASKETBALL_DOUBLE,       "Terrains de basketball 1 et 2");
-        addPin(Markers.BASKETBALL_SINGLE,       "Terrain de basketball 3");
+        addPin(Markers.BASEBALL_WEST);
+        addPin(Markers.BASKETBALL_DOUBLE);
+        addPin(Markers.BASKETBALL_SINGLE);
         addPin(Markers.BUILDING_CLUMP_EAST);
-        addPin(Markers.CAFETERIA,               "Cafétéria");
+        addPin(Markers.CAFETERIA);
         addPin(Markers.COVERED_DINING_ROOM);
-        addPin(Markers.GENERAL_QUARTERS,        "Quartier général de l'AESDCCS");
+        addPin(Markers.GENERAL_QUARTERS);
         addPin(Markers.IS_THIS_EVEN_A_FIELD);
         addPin(Markers.MINI_PUTT_BUILDING);
         addPin(Markers.NORTH_EAST_DOME);
         addPin(Markers.OUTSIDE_STAGE);
         addPin(Markers.POOL);
+        addPin(Markers.ROCK_CLIMBING_WALL);
         addPin(Markers.SMALL_SHITTY_BUILDING);
-        addPin(Markers.SOCCER_FIELDS,           "Terrains de soccer");
+        addPin(Markers.SOCCER_FIELDS);
         addPin(Markers.SOUTH_EAST_PORTABLE);
-        //addPin(Markers.SOUTH_WEST_BUILDING);
         addPin(Markers.SOUTH_WEST_DOME);
         addPin(Markers.SOUTH_WEST_PORTABLE_BOTTOM);
         addPin(Markers.SOUTH_WEST_PORTABLE_TOP);
         addPin(Markers.STAGE_DOME);
         addPin(Markers.TENNIS_COURTS);
         addPin(Markers.VOLLEYBALL);
+
+        addPin(Markers.ACADEMIE_CATHOLIQUE_MERE_TERESA);
+        addPin(Markers.JEAN_VANIER);
+        addPin(Markers.MONSEIGNEUR_DE_CHARBONNEL);
+        addPin(Markers.NOUVELLE_ALLIANCE);
+        addPin(Markers.PERE_RENE_DE_GALINEE);
+        addPin(Markers.RENAISSANCE);
+        addPin(Markers.SAINT_CHARLES_GARNIER);
+        addPin(Markers.SAINT_FRERE_ANDRE);
+        addPin(Markers.SAINTE_FAMILLE);
+        addPin(Markers.SAINTE_TRINITE);
+
+        addPin(Markers.CONVENIENCE_STORE);
+        addPin(Markers.INFIRMARY);
+        addPin(Markers.REFEREE_TENT);
+        addPin(Markers.TEACHERS_LOUNGE);
 
         layoutParams.addRule(RelativeLayout.BELOW, R.id.info_layout);
         layoutParams.addRule(RelativeLayout.ABOVE, R.id.incompetence);
@@ -242,39 +252,46 @@ public class MapFragment extends Fragment {
     @Subscribe
     public void onEvent(ShowMapCoordsEvent e) {
 
-        /*for(Marker marker : markers)
+        if(isAdded()) {
+
+            /*for(Marker marker : markers)
             if(marker.view instanceof ImageView)
                 ((ImageView)marker.view).setImageResource(R.drawable.ic_place_grey_36px);*/
 
-        self.findViewById(R.id.reset_button).setVisibility(View.VISIBLE);
+            View resetButton = self.findViewById(R.id.reset_button);
 
-        for(Marker marker : markers)
-            marker.view.setVisibility(View.GONE);
+            if(resetButton != null)
+                resetButton.setVisibility(View.VISIBLE);
 
-        tileView.scrollToAndCenter(e.longitude, e.latitude);
+            for(Marker marker : markers)
+                marker.view.setVisibility(View.GONE);
 
-        View view = markers.getMarkerAtCoords(e.latitude, e.longitude).view;
-        view.setVisibility(View.VISIBLE);
+            tileView.scrollToAndCenter(e.longitude, e.latitude);
+
+            View view = markers.getMarkerAtCoords(e.latitude, e.longitude).view;
+            view.setVisibility(View.VISIBLE);
 
         /*if(view instanceof ImageView)
             ((ImageView)view).setImageResource(R.drawable.ic_place_red_36px);*/
 
-        TranslateAnimation anim = new TranslateAnimation(
-                TranslateAnimation.RELATIVE_TO_SELF, 0f,
-                TranslateAnimation.RELATIVE_TO_SELF, 0f,
-                TranslateAnimation.RELATIVE_TO_SELF, 0f,
-                TranslateAnimation.RELATIVE_TO_SELF, -0.5f
-        );
+            TranslateAnimation anim = new TranslateAnimation(
+                    TranslateAnimation.RELATIVE_TO_SELF, 0f,
+                    TranslateAnimation.RELATIVE_TO_SELF, 0f,
+                    TranslateAnimation.RELATIVE_TO_SELF, 0f,
+                    TranslateAnimation.RELATIVE_TO_SELF, -0.5f
+            );
 
-        view.invalidate();
-        view.clearAnimation();
-        view.invalidate();
-        anim.setDuration(300);
-        anim.setRepeatCount(5);
-        anim.setRepeatMode(TranslateAnimation.REVERSE);
-        anim.setInterpolator(new DecelerateInterpolator(1.5f));
-        view.startAnimation(anim);
-        view.invalidate();
+            view.invalidate();
+            view.clearAnimation();
+            view.invalidate();
+            anim.setDuration(300);
+            anim.setRepeatCount(5);
+            anim.setRepeatMode(TranslateAnimation.REVERSE);
+            anim.setInterpolator(new DecelerateInterpolator(1.5f));
+            view.startAnimation(anim);
+            view.invalidate();
+
+        }
 
     }
 
@@ -287,21 +304,15 @@ public class MapFragment extends Fragment {
 
     }
 
-    private View addPin(Coordinates location) {
-
-        return addPin(location, null);
-
-    }
-
-    private View addPin(Coordinates location, String title) {
+    private View addPin(MarkerInfo markerInfo) {
 
         ImageView imageView = new ImageView(self.getContext());
         imageView.setImageResource(R.drawable.ic_place_red_36px);
-        View view = tileView.addMarker(imageView, location.longitude, location.latitude, -0.5f, -1.0f);
+        View view = tileView.addMarker(imageView, markerInfo.getCoordinates().longitude, markerInfo.getCoordinates().latitude, -0.5f, -1.0f);
 
-        view.setTag(new CalloutInfo(title, location.longitude, location.latitude));
+        view.setTag(new CalloutInfo(markerInfo.getName(), markerInfo.getCoordinates().longitude, markerInfo.getCoordinates().latitude));
 
-        markers.addMarker(location.latitude, location.longitude, view);
+        markers.addMarker(markerInfo.getCoordinates().latitude, markerInfo.getCoordinates().longitude, view);
 
         return view;
 

@@ -31,7 +31,7 @@ import android.widget.TextView;
 import com.nicoco007.jeuxdelaesd.R;
 import com.nicoco007.jeuxdelaesd.adapter.SimpleSpinnerAdapter;
 import com.nicoco007.jeuxdelaesd.events.ShowMapCoordsEvent;
-import com.nicoco007.jeuxdelaesd.model.AesdDayActivity;
+import com.nicoco007.jeuxdelaesd.model.DayActivity;
 
 import org.greenrobot.eventbus.EventBus;
 import org.joda.time.DateTime;
@@ -42,13 +42,13 @@ import java.util.Locale;
 
 public class ActivityDialogFragment extends DialogFragment {
 
-    private AesdDayActivity item;
+    private DayActivity item;
 
     private EventBus eventBus = EventBus.getDefault();
 
     public ActivityDialogFragment() {}
 
-    public void setItem(AesdDayActivity item) {
+    public void setItem(DayActivity item) {
 
         this.item = item;
 
