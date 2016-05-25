@@ -36,9 +36,9 @@ android {
             keyPassword System.getenv("AESD_KEYPASS")
         }
     }
-
     buildTypes {
         release {
+            signingConfigs.release
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
