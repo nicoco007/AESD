@@ -189,29 +189,29 @@ public class MapFragment extends Fragment {
         tileView.addMarker(currentLocationMarker, 0.5d, 0.5d, -0.5f, -0.5f);
 
         addPin(Markers.ARCHERY);
-        addPin(Markers.BASEBALL_EAST,           "Terrain de balle-molle 2");
+        addPin(Markers.BASEBALL_EAST,               "Terrain de balle-molle 2");
         addPin(Markers.BASEBALL_SOUTH);
-        addPin(Markers.BASEBALL_WEST,           "Terrain de balle-molle 1");
-        addPin(Markers.BASKETBALL_DOUBLE,       "Terrains de basketball 1 et 2");
-        addPin(Markers.BASKETBALL_SINGLE,       "Terrain de basketball 3");
+        addPin(Markers.BASEBALL_WEST,               "Terrain de balle-molle 1");
+        addPin(Markers.BASKETBALL_DOUBLE,           "Terrains de basketball 1 et 2");
+        addPin(Markers.BASKETBALL_SINGLE,           "Terrain de basketball 3");
         addPin(Markers.BUILDING_CLUMP_EAST);
-        addPin(Markers.CAFETERIA,               "Cafétéria");
+        addPin(Markers.CAFETERIA,                   "Cafétéria");
         addPin(Markers.COVERED_DINING_ROOM);
-        addPin(Markers.GENERAL_QUARTERS,        "Quartier général de l'AESDCCS");
+        addPin(Markers.GENERAL_QUARTERS,            "Quartier général de l'AESDCCS");
         addPin(Markers.IS_THIS_EVEN_A_FIELD);
         addPin(Markers.MINI_PUTT_BUILDING);
         addPin(Markers.NORTH_EAST_DOME);
         addPin(Markers.OUTSIDE_STAGE);
         addPin(Markers.POOL);
         addPin(Markers.SMALL_SHITTY_BUILDING);
-        addPin(Markers.SOCCER_FIELDS,           "Terrains de soccer");
+        addPin(Markers.SOCCER_FIELDS,               "Terrains de soccer");
         addPin(Markers.SOUTH_EAST_PORTABLE);
         //addPin(Markers.SOUTH_WEST_BUILDING);
         addPin(Markers.SOUTH_WEST_DOME);
         addPin(Markers.SOUTH_WEST_PORTABLE_BOTTOM);
         addPin(Markers.SOUTH_WEST_PORTABLE_TOP);
-        addPin(Markers.STAGE_DOME);
-        addPin(Markers.TENNIS_COURTS);
+        addPin(Markers.STAGE_DOME,                  "Tennis de table\nDanse\nCérémonie de clôture");
+        addPin(Markers.TENNIS_COURTS,               "Tennis\nBallon-chasseur");
         addPin(Markers.VOLLEYBALL);
 
         layoutParams.addRule(RelativeLayout.BELOW, R.id.info_layout);
