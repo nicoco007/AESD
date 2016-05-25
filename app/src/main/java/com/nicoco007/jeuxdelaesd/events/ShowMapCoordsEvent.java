@@ -23,13 +23,22 @@ package com.nicoco007.jeuxdelaesd.events;
     }
 }*/
 
+import com.nicoco007.jeuxdelaesd.model.Coordinates;
+
 public class ShowMapCoordsEvent {
     public double latitude;
     public double longitude;
 
-    public ShowMapCoordsEvent(double latitude, double longitude)
-    {
+    public ShowMapCoordsEvent(Coordinates coordinates) {
+
+        this(coordinates.latitude, coordinates.longitude);
+
+    }
+
+    public ShowMapCoordsEvent(double latitude, double longitude) {
+
         this.latitude = latitude;
         this.longitude = longitude;
+
     }
 }

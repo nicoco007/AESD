@@ -29,7 +29,7 @@ import android.widget.TextView;
 
 import com.nicoco007.jeuxdelaesd.R;
 import com.nicoco007.jeuxdelaesd.fragment.ActivityDialogFragment;
-import com.nicoco007.jeuxdelaesd.model.AesdDayActivity;
+import com.nicoco007.jeuxdelaesd.model.DayActivity;
 
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
@@ -38,14 +38,14 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
-public class ActivitiesListAdapter extends ArrayAdapter<AesdDayActivity> implements Filterable {
+public class ActivitiesListAdapter extends ArrayAdapter<DayActivity> implements Filterable {
 
-    private List<AesdDayActivity> allItems;
-    private List<AesdDayActivity> currentItems = new ArrayList<>();
+    private List<DayActivity> allItems;
+    private List<DayActivity> currentItems = new ArrayList<>();
 
     private final ActivitiesFilter filter = new ActivitiesFilter();
 
-    public ActivitiesListAdapter(Context context, List<AesdDayActivity> list) {
+    public ActivitiesListAdapter(Context context, List<DayActivity> list) {
 
         super(context, 0, list);
         this.allItems = list;
@@ -61,7 +61,7 @@ public class ActivitiesListAdapter extends ArrayAdapter<AesdDayActivity> impleme
     }
 
     @Override
-    public AesdDayActivity getItem(int location) {
+    public DayActivity getItem(int location) {
 
         return currentItems.get(location);
 
@@ -76,7 +76,7 @@ public class ActivitiesListAdapter extends ArrayAdapter<AesdDayActivity> impleme
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
 
-        final AesdDayActivity item = getItem(position);
+        final DayActivity item = getItem(position);
 
         View view;
 
@@ -144,9 +144,9 @@ public class ActivitiesListAdapter extends ArrayAdapter<AesdDayActivity> impleme
 
             } else {
 
-                ArrayList<AesdDayActivity> filteredItems = new ArrayList<>();
+                ArrayList<DayActivity> filteredItems = new ArrayList<>();
 
-                for(AesdDayActivity item : allItems) {
+                for(DayActivity item : allItems) {
 
                     if(item.getText().toLowerCase().contains(constraint.toString().toLowerCase())) {
 
@@ -174,7 +174,7 @@ public class ActivitiesListAdapter extends ArrayAdapter<AesdDayActivity> impleme
             if(results.count > 0) {
 
                 if(results.values instanceof ArrayList<?>)
-                    currentItems.addAll((ArrayList<AesdDayActivity>)results.values);
+                    currentItems.addAll((ArrayList<DayActivity>)results.values);
 
                 notifyDataSetChanged();
 

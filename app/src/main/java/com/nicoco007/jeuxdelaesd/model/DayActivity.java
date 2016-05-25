@@ -38,9 +38,9 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Locale;
 
-public class AesdDayActivity {
+public class DayActivity {
 
-    private static String TAG = "AesdDayActivity";
+    private static String TAG = "DayActivity";
     private static String PREFERENCES_FILE = "ACTIVITY_TIMERS";
 
     private Context context;
@@ -53,11 +53,11 @@ public class AesdDayActivity {
     private PendingIntent pendingIntent;
     private Integer alarmDelay = null;
 
-    public AesdDayActivity(Context context, String text, String startTime, String endTime, Coordinates marker) {
+    public DayActivity(Context context, String text, String startTime, String endTime, MarkerInfo markerInfo) {
 
         this.context = context;
         this.text = text;
-        this.marker = marker;
+        this.marker = markerInfo.getCoordinates();
 
         try {
             SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss zzz", Locale.CANADA_FRENCH);
