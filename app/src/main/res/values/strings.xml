@@ -14,7 +14,7 @@
   ~ limitations under the License.
   -->
 
-<resources>
+<resources xmlns:tools="http://schemas.android.com/tools">
     <string name="app_name">Jeux de l\'AESD</string>
     <string name="app_label">SCG AESD</string>
     <string name="title_activity_map">Activités</string>
@@ -25,7 +25,7 @@
     <string name="cd_hours">heures</string>
     <string name="cd_minutes">minutes</string>
     <string name="cd_seconds">secondes</string>
-    <string name="games_date">2016/05/26</string>
+    <string name="games_date" tools:ignore="TypographyDashes">2017-05-25</string>
     <string name="time_sep">:</string>
     <string name="drawer_open">Open drawer</string>
     <string name="drawer_close">Close drawer</string>

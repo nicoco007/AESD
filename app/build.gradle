@@ -25,15 +25,15 @@ android {
         applicationId "com.nicoco007.jeuxdelaesd"
         minSdkVersion 19
         targetSdkVersion 23
-        versionCode 3
-        versionName "1.0.0"
+        versionCode 4
+        versionName "1.0.1"
     }
-    signingConfigs {
+    /*signingConfigs {
         release {
-            storeFile file(System.getenv("KEYSTORE_PATH"))
-            storePassword System.getenv("KEYSTOREPASS")
+            storeFile file("aesd-release.jks")
+            //storePassword System.getenv("KEYSTOREPASS")
             keyAlias "keystore"
-            keyPassword System.getenv("AESD_KEYPASS")
+            //keyPassword System.getenv("AESD_KEYPASS")
         }
     }
     buildTypes {
@@ -42,7 +42,7 @@ android {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
-    }
+    }*/
 }
 
 dependencies {

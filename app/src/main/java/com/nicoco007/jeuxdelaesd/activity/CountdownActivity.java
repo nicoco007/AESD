@@ -28,6 +28,8 @@ import java.util.Locale;
 
 public class CountdownActivity extends AesdActivity {
 
+    private static final String GAMES_START_TIME = "2017-05-25 10:00:00 GMT-04:00";
+
     private CountDownTimer timer = null;
 
     @Override
@@ -39,12 +41,12 @@ public class CountdownActivity extends AesdActivity {
         long diff = 0;
 
         try {
-            diff = TimeHelper.getUtcTimeDifference("2016-05-26 10:00:00 GMT-04:00");
+            diff = TimeHelper.getUtcTimeDifference(GAMES_START_TIME);
         } catch (Exception ex) {
             Toast.makeText(getApplicationContext(), ex.toString(), Toast.LENGTH_LONG).show();
         }
 
-        if(timer == null) {
+        if (timer == null) {
             timer = new CountDownTimer(diff, 100) {
                 @Override
                 public void onTick(long millisUntilFinished) {

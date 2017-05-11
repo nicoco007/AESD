@@ -26,9 +26,7 @@ public class TimeHelper {
 
     public static long getUtcTimeDifference(String date) throws ParseException {
 
-        SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss zzz", Locale.CANADA_FRENCH);
-
-        Date enddate = format.parse(date);
+        Date enddate = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss zzz", Locale.CANADA_FRENCH).parse(date);
 
         return enddate.getTime() - System.currentTimeMillis();
 
