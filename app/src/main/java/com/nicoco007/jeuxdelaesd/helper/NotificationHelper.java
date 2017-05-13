@@ -32,7 +32,7 @@ public class NotificationHelper {
 
         builder.setContentTitle(title);
         builder.setContentText(content);
-        builder.setSmallIcon(R.mipmap.ic_scg);
+        builder.setSmallIcon(R.mipmap.ic_launcher); // TODO: dedicated notification icon
         builder.setVibrate(new long[] { 1000, 1000, 1000, 1000, 1000 });
         builder.setLights(0xFFFFFFFF, 3000, 3000);
 

@@ -7,9 +7,9 @@
     <ImageView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:src="@mipmap/logo"
+        android:src="@mipmap/logo_monochrome_512"
         android:gravity="center"
         android:scaleType="centerInside"
-        android:layout_margin="75dp"/>
+        android:layout_margin="15dp"/>
 
 </RelativeLayout>

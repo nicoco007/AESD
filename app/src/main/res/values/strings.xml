@@ -16,7 +16,7 @@
 
 <resources xmlns:tools="http://schemas.android.com/tools">
     <string name="app_name">Jeux de l\'AESD</string>
-    <string name="app_label">SCG AESD</string>
+    <string name="app_label">AESD</string>
     <string name="title_activity_map">Activités</string>
     <string name="title_activity_countdown">Décompte</string>
     <string name="action_settings">Settings</string>
