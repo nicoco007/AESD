@@ -25,22 +25,17 @@ import android.support.v4.app.NotificationCompat;
 import com.nicoco007.jeuxdelaesd.R;
 
 public class NotificationHelper {
-
     public static Notification createNotification(Context context, String title, String content) {
-
-        NotificationCompat.Builder builder = new NotificationCompat.Builder(context);
-
-        builder.setContentTitle(title);
-        builder.setContentText(content);
-        builder.setSmallIcon(R.mipmap.ic_launcher); // TODO: dedicated notification icon
-        builder.setVibrate(new long[] { 1000, 1000, 1000, 1000, 1000 });
-        builder.setLights(0xFFFFFFFF, 3000, 3000);
+        NotificationCompat.Builder builder = new NotificationCompat.Builder(context)
+                .setContentTitle(title)
+                .setContentText(content)
+                .setSmallIcon(R.mipmap.ic_launcher) // TODO: dedicated notification icon
+                .setVibrate(new long[] { 1000, 1000, 1000, 1000, 1000 })
+                .setLights(0xFFFFFFFF, 3000, 3000);
 
         Uri alarmSound = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
         builder.setSound(alarmSound);
 
         return builder.build();
-
     }
-
 }

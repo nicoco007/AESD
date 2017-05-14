@@ -21,29 +21,30 @@ import android.content.Context;
 import android.os.Bundle;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
-import android.support.v4.view.ViewPager;
-import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 
+import com.nicoco007.jeuxdelaesd.AesdViewPager;
 import com.nicoco007.jeuxdelaesd.R;
 import com.nicoco007.jeuxdelaesd.events.ShowMapCoordsEvent;
 import com.nicoco007.jeuxdelaesd.fragment.BuildingsFragment;
 import com.nicoco007.jeuxdelaesd.fragment.MapFragment;
 import com.nicoco007.jeuxdelaesd.fragment.ScheduleFragment;
 import com.nicoco007.jeuxdelaesd.adapter.ViewPagerAdapter;
+import com.nicoco007.jeuxdelaesd.helper.APICommunication;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 
 public class MapActivity extends AesdActivity {
 
-    private static ViewPager viewPager;
+    private AesdViewPager viewPager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        APICommunication.loadLocations(true);
 
         // set up activity
         super.onCreate(savedInstanceState);
@@ -55,10 +56,10 @@ public class MapActivity extends AesdActivity {
             getSupportActionBar().setTitle(getString(R.string.title_activity_map));
 
         // get viewpager
-        viewPager = (ViewPager)findViewById(R.id.viewpager);
+        viewPager = (AesdViewPager) findViewById(R.id.viewpager);
         TabLayout tabLayout = (TabLayout)findViewById(R.id.tabs_activities);
 
-        if(viewPager != null && tabLayout != null) {
+        if (viewPager != null && tabLayout != null) {
 
             // create fragments for viewpager
             Fragment mapFragment = new MapFragment();
@@ -76,6 +77,8 @@ public class MapActivity extends AesdActivity {
 
             // prevent unloading of map
             viewPager.setOffscreenPageLimit(2);
+
+            viewPager.setPagingEnabled(false);
 
             // get TabLayout and set it up with ViewPager
             tabLayout.setupWithViewPager(viewPager);

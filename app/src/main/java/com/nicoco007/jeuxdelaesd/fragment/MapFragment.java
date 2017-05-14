@@ -16,60 +16,52 @@
 
 package com.nicoco007.jeuxdelaesd.fragment;
 
-import android.Manifest;
-import android.content.Context;
-import android.content.pm.PackageManager;
-import android.location.GpsSatellite;
-import android.location.GpsStatus;
-import android.location.Location;
-import android.location.LocationListener;
-import android.location.LocationManager;
-import android.location.LocationProvider;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
-import android.support.v4.content.ContextCompat;
-import android.util.Log;
+import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.animation.DecelerateInterpolator;
-import android.view.animation.TranslateAnimation;
-import android.widget.Button;
-import android.widget.ImageView;
-import android.widget.RelativeLayout;
-import android.widget.TextView;
+import android.widget.Toast;
 
-import com.nicoco007.jeuxdelaesd.Activities;
-import com.nicoco007.jeuxdelaesd.model.MarkerInfo;
-import com.nicoco007.jeuxdelaesd.Markers;
+import com.mapbox.mapboxsdk.Mapbox;
+import com.mapbox.mapboxsdk.annotations.MarkerOptions;
+import com.mapbox.mapboxsdk.camera.CameraPosition;
+import com.mapbox.mapboxsdk.geometry.LatLng;
+import com.mapbox.mapboxsdk.geometry.LatLngBounds;
+import com.mapbox.mapboxsdk.location.LocationSource;
+import com.mapbox.mapboxsdk.maps.MapView;
+import com.mapbox.mapboxsdk.maps.MapboxMap;
+import com.mapbox.mapboxsdk.maps.OnMapReadyCallback;
+import com.mapbox.services.android.telemetry.location.LocationEngine;
+import com.mapbox.services.android.telemetry.permissions.PermissionsListener;
+import com.mapbox.services.android.telemetry.permissions.PermissionsManager;
 import com.nicoco007.jeuxdelaesd.R;
-import com.nicoco007.jeuxdelaesd.events.ShowMapCoordsEvent;
-import com.nicoco007.jeuxdelaesd.model.DayActivity;
-import com.nicoco007.jeuxdelaesd.model.Callout;
-import com.nicoco007.jeuxdelaesd.model.CalloutInfo;
-import com.nicoco007.jeuxdelaesd.model.Marker;
+import com.nicoco007.jeuxdelaesd.events.EventListener;
+import com.nicoco007.jeuxdelaesd.helper.APICommunication;
 import com.nicoco007.jeuxdelaesd.model.MarkerCollection;
-import com.nicoco007.jeuxdelaesd.model.PointD;
-import com.qozix.tileview.TileView;
-import com.qozix.tileview.markers.MarkerLayout;
+import com.nicoco007.jeuxdelaesd.onlinemodel.Activity;
 
 import org.greenrobot.eventbus.EventBus;
-import org.greenrobot.eventbus.Subscribe;
 
 import java.util.ArrayList;
-import java.util.Locale;
+import java.util.List;
 
-public class MapFragment extends Fragment {
+public class MapFragment extends Fragment implements PermissionsListener {
 
     public static final int REQUEST_PERMISSION_GPS = 1;
     public static final String TAG = "MapFragment";
 
     private View self;                                          // save current view into variable
     private EventBus eventBus = EventBus.getDefault();          // eventbus for focusing a point
-    private TileView tileView;                                  // global tileview instance
     private MarkerCollection markers = new MarkerCollection();  // tileview markers
-    private ImageView currentLocationMarker;                    // current location marker
+
+    private MapView mapView;
+    private MapboxMap map;
+
+    private LocationEngine locationEngine;
+
+    private static final int PERMISSIONS_LOCATION = 0;
 
     /**
      * school
@@ -93,9 +85,7 @@ public class MapFragment extends Fragment {
     private static final double maxLong = -79.21623229980469;
 
     public MapFragment() {
-
-        eventBus.register(this);
-
+        //eventBus.register(this);
     }
 
     @Override
@@ -105,321 +95,141 @@ public class MapFragment extends Fragment {
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        // init with access token - we need to do this now or inflating will fail
+        Mapbox.getInstance(getContext(), getString(R.string.mapbox_access_token));
 
+        // inflate view
         self = inflater.inflate(R.layout.fragment_map, container, false);
 
-        RelativeLayout relativeLayout = (RelativeLayout)self.findViewById(R.id.map_fragment_layout);
-        RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
-        tileView = new TileView(getContext());
+        // get location engine object for later use
+        locationEngine = LocationSource.getLocationEngine(getContext());
+        locationEngine.activate();
 
-        tileView.setSize(2048, 2432);
-        tileView.addDetailLevel(1f, "robinhood/19/tile-%d_%d.jpg");
-        tileView.addDetailLevel(2f, "robinhood/20/tile-%d_%d.jpg");
-        tileView.setScaleLimits(1f, 3f);
-        tileView.setShouldRenderWhilePanning(true);
-        tileView.defineBounds(minLong, maxLat, maxLong, minLat);
+        /*MapboxMapOptions options = new MapboxMapOptions()
+                .styleUrl(Style.SATELLITE)
+                .locationEnabled(true)
+                .camera(new CameraPosition.Builder()
+                        .target(new LatLng((minLat + maxLat) / 2, (minLong + maxLong) / 2))
+                        .zoom(16)
+                        .build());*/
 
-        tileView.setMarkerTapListener(new MarkerLayout.MarkerTapListener() {
+        mapView = (MapView) self.findViewById(R.id.mapview);
+        mapView.onCreate(savedInstanceState);
+
+        mapView.getMapAsync(new OnMapReadyCallback() {
             @Override
-            public void onMarkerTap(View view, int x, int y) {
+            public void onMapReady(MapboxMap mapboxMap) {
+                map = mapboxMap;
 
-                Callout callout = new Callout(view.getContext());
+                map.setCameraPosition(new CameraPosition.Builder()
+                        .target(new LatLng((minLat + maxLat) / 2, (minLong + maxLong) / 2))
+                        .zoom(16)
+                        .build());
 
-                CalloutInfo calloutInfo = (CalloutInfo)view.getTag();
-                PointD position = calloutInfo.getPosition();
+                // doesnt work in options for some reason
+                map.setMinZoomPreference(15);
+                map.setMaxZoomPreference(18);
+                map.setMyLocationEnabled(true);
 
-                if(tileView.getScale() < 2f) {
-                    tileView.slideToAndCenterWithScale(position.x, position.y, 2f);
-                } else {
-                    tileView.slideToAndCenter(position.x, position.y);
-                }
+                map.setLatLngBoundsForCameraTarget(new LatLngBounds.Builder().include(new LatLng(minLat, minLong)).include(new LatLng(maxLat, maxLong)).build());
 
-                tileView.addCallout(callout, position.x, position.y, -0.5f, -1.0f);
+                enableLocation();
 
-                if(calloutInfo.getTitle() == null) {
-
-                    ArrayList<String> activityNames = new ArrayList<>();
-
-                    for(DayActivity activity : Activities.get(getContext())) {
-
-                        if(activity.getMarker().latitude == position.y && activity.getMarker().longitude == position.x) {
-
-                            activityNames.add(activity.getText());
-
-                        }
-
-                    }
-
-                    if(activityNames.size() > 0) {
-
-                        String concat = activityNames.get(0);
-
-                        for(int i = 1; i < activityNames.size(); i++) {
-                            concat += ",\n" + activityNames.get(i);
-                        }
-
-                        callout.setTitle(concat);
-
-                    } else {
-
-                        callout.setTitle("(rien)");
-
-                    }
-
-                } else {
-
-                    callout.setTitle(calloutInfo.getTitle());
-
-                }
-
-                callout.transitionIn();
-
+                APICommunication.loadLocations();
             }
         });
 
-        currentLocationMarker = new ImageView(self.getContext());
-        currentLocationMarker.setImageResource(R.drawable.ic_my_location_blue_36dp);
-        currentLocationMarker.setVisibility(View.INVISIBLE);
-        tileView.addMarker(currentLocationMarker, 0.5d, 0.5d, -0.5f, -0.5f);
-
-        addPin(Markers.ARCHERY);
-        addPin(Markers.BASEBALL_EAST);
-        addPin(Markers.BASEBALL_SOUTH);
-        addPin(Markers.BASEBALL_WEST);
-        addPin(Markers.BASKETBALL_DOUBLE);
-        addPin(Markers.BASKETBALL_SINGLE);
-        addPin(Markers.BUILDING_CLUMP_EAST);
-        addPin(Markers.CAFETERIA);
-        addPin(Markers.COVERED_DINING_ROOM);
-        addPin(Markers.GENERAL_QUARTERS);
-        addPin(Markers.IS_THIS_EVEN_A_FIELD);
-        addPin(Markers.MINI_PUTT_BUILDING);
-        addPin(Markers.NORTH_EAST_DOME);
-        addPin(Markers.OUTSIDE_STAGE);
-        addPin(Markers.POOL);
-        addPin(Markers.ROCK_CLIMBING_WALL);
-        addPin(Markers.SMALL_SHITTY_BUILDING);
-        addPin(Markers.SOCCER_FIELDS);
-        addPin(Markers.SOUTH_EAST_PORTABLE);
-        addPin(Markers.SOUTH_WEST_DOME);
-        addPin(Markers.SOUTH_WEST_PORTABLE_BOTTOM);
-        addPin(Markers.SOUTH_WEST_PORTABLE_TOP);
-        addPin(Markers.STAGE_DOME);
-        addPin(Markers.TENNIS_COURTS);
-        addPin(Markers.VOLLEYBALL);
-
-        addPin(Markers.ACADEMIE_CATHOLIQUE_MERE_TERESA);
-        addPin(Markers.JEAN_VANIER);
-        addPin(Markers.MONSEIGNEUR_DE_CHARBONNEL);
-        addPin(Markers.NOUVELLE_ALLIANCE);
-        addPin(Markers.PERE_RENE_DE_GALINEE);
-        addPin(Markers.RENAISSANCE);
-        addPin(Markers.SAINT_CHARLES_GARNIER);
-        addPin(Markers.SAINT_FRERE_ANDRE);
-        addPin(Markers.SAINTE_FAMILLE);
-        addPin(Markers.SAINTE_TRINITE);
-
-        addPin(Markers.CONVENIENCE_STORE);
-        addPin(Markers.INFIRMARY);
-        addPin(Markers.REFEREE_TENT);
-        addPin(Markers.TEACHERS_LOUNGE);
-
-        layoutParams.addRule(RelativeLayout.BELOW, R.id.info_layout);
-        layoutParams.addRule(RelativeLayout.ABOVE, R.id.incompetence);
-        relativeLayout.addView(tileView, layoutParams);
-
-        if (ContextCompat.checkSelfPermission(self.getContext(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            requestPermissions(new String[] { Manifest.permission.ACCESS_FINE_LOCATION }, REQUEST_PERMISSION_GPS);
-        } else {
-            requestLocation();
-        }
-
-        Button resetButton = (Button)self.findViewById(R.id.reset_button);
-
-        resetButton.setOnClickListener(new View.OnClickListener() {
+        APICommunication.onLocationsUpdatedEventHandler.addListener(new EventListener<ArrayList<com.nicoco007.jeuxdelaesd.onlinemodel.Location>>() {
             @Override
-            public void onClick(View v) {
-                for(Marker marker : markers)
-                    marker.view.setVisibility(View.VISIBLE);
-
-                v.setVisibility(View.GONE);
+            public void handle(ArrayList<com.nicoco007.jeuxdelaesd.onlinemodel.Location> result) {
+                for (com.nicoco007.jeuxdelaesd.onlinemodel.Location location : result) {
+                    addMarker(location);
+                }
             }
         });
 
         return self;
     }
 
-    @Subscribe
-    public void onEvent(ShowMapCoordsEvent e) {
+    private void addMarker(com.nicoco007.jeuxdelaesd.onlinemodel.Location location) {
+        if (map != null) {
+            ArrayList<String> activityNames = new ArrayList<>();
 
-        if(isAdded()) {
+            for (Activity activity : location.getActivities()) {
+                activityNames.add(activity.getName());
+            }
 
-            /*for(Marker marker : markers)
-            if(marker.view instanceof ImageView)
-                ((ImageView)marker.view).setImageResource(R.drawable.ic_place_grey_36px);*/
+            String snippet = TextUtils.join("\n", activityNames);
 
-            View resetButton = self.findViewById(R.id.reset_button);
-
-            if(resetButton != null)
-                resetButton.setVisibility(View.VISIBLE);
-
-            for(Marker marker : markers)
-                marker.view.setVisibility(View.GONE);
-
-            tileView.scrollToAndCenter(e.longitude, e.latitude);
-
-            View view = markers.getMarkerAtCoords(e.latitude, e.longitude).view;
-            view.setVisibility(View.VISIBLE);
-
-        /*if(view instanceof ImageView)
-            ((ImageView)view).setImageResource(R.drawable.ic_place_red_36px);*/
-
-            TranslateAnimation anim = new TranslateAnimation(
-                    TranslateAnimation.RELATIVE_TO_SELF, 0f,
-                    TranslateAnimation.RELATIVE_TO_SELF, 0f,
-                    TranslateAnimation.RELATIVE_TO_SELF, 0f,
-                    TranslateAnimation.RELATIVE_TO_SELF, -0.5f
-            );
-
-            view.invalidate();
-            view.clearAnimation();
-            view.invalidate();
-            anim.setDuration(300);
-            anim.setRepeatCount(5);
-            anim.setRepeatMode(TranslateAnimation.REVERSE);
-            anim.setInterpolator(new DecelerateInterpolator(1.5f));
-            view.startAnimation(anim);
-            view.invalidate();
-
+            map.addMarker(new MarkerOptions()
+                    .position(new LatLng(location.getLatitude(), location.getLongitude()))
+                    .title(location.getName())
+                    .snippet(snippet));
         }
-
     }
 
-    private void setCurrentLocation(double latitude, double longitude, int accuracy) {
+    @SuppressWarnings("MissingPermission")
+    private void enableLocation() {
+        PermissionsManager permissionsManager = new PermissionsManager(this);
 
-        currentLocationMarker.setVisibility(View.VISIBLE);
-        tileView.moveMarker(currentLocationMarker, longitude, latitude);
-        TextView textView = (TextView)self.findViewById(R.id.coordinates);
-        textView.setText(String.format(Locale.CANADA, "Latitude: %f; Longitude: %f ±%dm", latitude, longitude, accuracy));
-
-    }
-
-    private View addPin(MarkerInfo markerInfo) {
-
-        ImageView imageView = new ImageView(self.getContext());
-        imageView.setImageResource(R.drawable.ic_place_red_36px);
-        View view = tileView.addMarker(imageView, markerInfo.getCoordinates().longitude, markerInfo.getCoordinates().latitude, -0.5f, -1.0f);
-
-        view.setTag(new CalloutInfo(markerInfo.getName(), markerInfo.getCoordinates().longitude, markerInfo.getCoordinates().latitude));
-
-        markers.addMarker(markerInfo.getCoordinates().latitude, markerInfo.getCoordinates().longitude, view);
-
-        return view;
-
+        if (!PermissionsManager.areLocationPermissionsGranted(getContext())) {
+            permissionsManager.requestLocationPermissions(getActivity());
+        }
     }
 
     @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-        switch (requestCode) {
-            case REQUEST_PERMISSION_GPS:
-                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED)
-                    requestLocation();
-
-                break;
-            default:
-                break;
-        }
+    public void onStart() {
+        super.onStart();
+        mapView.onStart();
     }
 
-    private void requestLocation() {
+    @Override
+    public void onResume() {
+        super.onResume();
+        mapView.onResume();
+    }
 
-        Log.i(TAG, "Attempting to request location...");
+    @Override
+    public void onPause() {
+        super.onPause();
+        mapView.onPause();
+    }
 
-        final TextView coordsTextView = (TextView) self.findViewById(R.id.coordinates);
-        final TextView statusTextView = (TextView) self.findViewById(R.id.status);
+    @Override
+    public void onStop() {
+        super.onStop();
+        mapView.onStop();
+    }
 
-        if(isAdded()) coordsTextView.setText(getString(R.string.attempting_load_gps));
+    @Override
+    public void onLowMemory() {
+        super.onLowMemory();
+        mapView.onLowMemory();
+    }
 
-        if (ContextCompat.checkSelfPermission(self.getContext(), Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        mapView.onDestroy();
+    }
 
-            final LocationManager location = (LocationManager) self.getContext().getSystemService(Context.LOCATION_SERVICE);
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        mapView.onSaveInstanceState(outState);
+    }
 
-            GpsStatus.Listener gpsListener = new GpsStatus.Listener() {
-                @Override
-                public void onGpsStatusChanged(int status) {
+    @Override
+    public void onExplanationNeeded(List<String> permissionsToExplain) {
+        Toast.makeText(getContext(), "Cette application nécessite votre position pour l'afficher sur la carte des lieux.", Toast.LENGTH_LONG).show();
+    }
 
-                    int satellites = 0;
-                    int satellitesInFix = 0;
-
-                    for (GpsSatellite sat : location.getGpsStatus(null).getSatellites()) {
-                        if (sat.usedInFix()) {
-                            satellitesInFix++;
-                        }
-                        satellites++;
-                    }
-
-                    if(isAdded()) statusTextView.setText(String.format(getString(R.string.satellite_amount), satellitesInFix, satellites));
-
-                }
-            };
-
-            LocationListener listener = new LocationListener() {
-                @Override
-                public void onLocationChanged(Location location) {
-
-                    if(isAdded()) self.findViewById(R.id.info_layout).setVisibility(View.GONE);
-
-                    Log.d(TAG, "Location changed");
-
-                    setCurrentLocation(location.getLatitude(), location.getLongitude(), (int)location.getAccuracy());
-
-                }
-
-                @Override
-                public void onStatusChanged(String provider, int status, Bundle extras) {
-
-                    Log.i(TAG, "Location listener status changed");
-
-                    switch (status) {
-
-                        case LocationProvider.AVAILABLE:
-                            break;
-                        case LocationProvider.TEMPORARILY_UNAVAILABLE:
-                        case LocationProvider.OUT_OF_SERVICE:
-                            if(isAdded()) self.findViewById(R.id.info_layout).setVisibility(View.VISIBLE);
-                            if(isAdded()) coordsTextView.setText(getString(R.string.loading_gps));
-                            break;
-
-                    }
-                }
-
-                @Override
-                public void onProviderEnabled(String provider) {
-                    Log.i(TAG, "Location provider enabled");
-                    if(isAdded()) self.findViewById(R.id.info_layout).setVisibility(View.VISIBLE);
-                }
-
-                @Override
-                public void onProviderDisabled(String provider) {
-                    Log.i(TAG, "Location provider disabled");
-                    if(isAdded()) self.findViewById(R.id.info_layout).setVisibility(View.GONE);
-                }
-            };
-
-            location.addGpsStatusListener(gpsListener);
-            location.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, listener);
-
-            if(isAdded()) self.findViewById(R.id.info_layout).setVisibility(View.VISIBLE);
-            if(isAdded()) coordsTextView.setText(getString(R.string.loading_gps));
-
+    @Override
+    public void onPermissionResult(boolean granted) {
+        if (granted) {
+            enableLocation();
         } else {
-
-            coordsTextView.setText(R.string.permission_failed);
-
-            if(isAdded()) self.findViewById(R.id.info_layout).setVisibility(View.GONE);
-
+            Toast.makeText(getContext(), "Vous avez refusé la demande d'accès à la position.", Toast.LENGTH_LONG).show();
         }
-
     }
-
 }

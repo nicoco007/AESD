@@ -177,7 +177,7 @@ public class DayActivity {
             SharedPreferences settings = context.getSharedPreferences(PREFERENCES_FILE, 0);
             SharedPreferences.Editor editor = settings.edit();
             editor.putInt(Integer.toString(hashCode()), delay);
-            editor.commit();
+            editor.apply();
 
             setAlarmEnabled(true);
 
@@ -227,16 +227,18 @@ public class DayActivity {
 
         Log.i(TAG, "Clearing notification for " + text);
 
-        AlarmManager alarmManager = (AlarmManager)context.getSystemService(Context.ALARM_SERVICE);
-        alarmManager.cancel(pendingIntent);
-        alarmDelay = null;
+        if (pendingIntent != null) {
+            AlarmManager alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
+            alarmManager.cancel(pendingIntent);
+            alarmDelay = null;
 
-        SharedPreferences settings = context.getSharedPreferences(PREFERENCES_FILE, 0);
-        SharedPreferences.Editor editor = settings.edit();
-        editor.remove(Integer.toString(hashCode()));
-        editor.commit();
+            SharedPreferences settings = context.getSharedPreferences(PREFERENCES_FILE, 0);
+            SharedPreferences.Editor editor = settings.edit();
+            editor.remove(Integer.toString(hashCode()));
+            editor.apply();
 
-        setAlarmEnabled(false);
+            setAlarmEnabled(false);
+        }
 
     }
 
