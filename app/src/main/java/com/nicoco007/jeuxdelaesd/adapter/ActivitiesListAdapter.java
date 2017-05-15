@@ -109,8 +109,7 @@ public class ActivitiesListAdapter extends ArrayAdapter<Activity> implements Fil
                 item.getEndTime().getMinuteOfHour()
         ));
 
-        /*
-        final int id = view.hashCode();
+        /*final int id = view.hashCode();
 
         final RelativeLayout layout = (RelativeLayout)view.findViewById(R.id.lvia_layout);
 
@@ -121,9 +120,9 @@ public class ActivitiesListAdapter extends ArrayAdapter<Activity> implements Fil
                 dialog.setItem(item);
                 dialog.show(((FragmentActivity)getContext()).getSupportFragmentManager(), "ala_dialog_" + Integer.toString(id));
             }
-        });
+         );*/
 
-        item.setView(view.findViewById(R.id.lvia_image_timer));*/
+        //item.setView(view.findViewById(R.id.lvia_image_timer));
 
         return view;
     }

@@ -32,6 +32,7 @@ import com.nicoco007.jeuxdelaesd.R;
 import com.nicoco007.jeuxdelaesd.adapter.SimpleSpinnerAdapter;
 import com.nicoco007.jeuxdelaesd.events.ShowMapCoordsEvent;
 import com.nicoco007.jeuxdelaesd.model.DayActivity;
+import com.nicoco007.jeuxdelaesd.onlinemodel.Activity;
 
 import org.greenrobot.eventbus.EventBus;
 import org.joda.time.DateTime;
@@ -42,22 +43,19 @@ import java.util.Locale;
 
 public class ActivityDialogFragment extends DialogFragment {
 
-    private DayActivity item;
+    private Activity item;
 
     private EventBus eventBus = EventBus.getDefault();
 
     public ActivityDialogFragment() {}
 
-    public void setItem(DayActivity item) {
-
+    public void setActivity(Activity item) {
         this.item = item;
-
     }
 
     @Override
     @NonNull
     public Dialog onCreateDialog(Bundle savedInstanceState) {
-
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
 
         if(item != null) {
@@ -70,7 +68,7 @@ public class ActivityDialogFragment extends DialogFragment {
 
             Button button = (Button)dialogView.findViewById(R.id.dialog_activity_button);
 
-            if(item.getMarker() == null) {
+            if(item.getParentLocation() == null) {
                 button.setEnabled(false);
                 button.setText(getString(R.string.location_unavailable));
             }
@@ -78,8 +76,8 @@ public class ActivityDialogFragment extends DialogFragment {
             button.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    if(item.getMarker() != null) {
-                        eventBus.post(new ShowMapCoordsEvent(item.getMarker().latitude, item.getMarker().longitude));
+                    if(item.getParentLocation() != null) {
+                        eventBus.post(new ShowMapCoordsEvent(item.getParentLocation().getLatitude(), item.getParentLocation().getLongitude()));
                         getDialog().dismiss();
                     }
                 }
@@ -99,7 +97,7 @@ public class ActivityDialogFragment extends DialogFragment {
 
             spinner.setAdapter(new SimpleSpinnerAdapter(getContext(), spinnerItems));
 
-            spinner.setSelection(item.getRemindIndex());
+            /*spinner.setSelection(item.getRemindIndex());
 
             spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
                 @Override
@@ -129,32 +127,23 @@ public class ActivityDialogFragment extends DialogFragment {
                     item.clearNotification();
 
                 }
-            });
+            });*/
 
             builder.setView(dialogView);
 
-            builder.setTitle(item.getText());
-
+            builder.setTitle(item.getName());
         } else {
-
             builder.setTitle("Woupelai");
             builder.setMessage("Une erreur s'est produite.");
-
         }
 
         builder.setPositiveButton("Fermer", new DialogInterface.OnClickListener() {
-
             @Override
             public void onClick(DialogInterface dialog, int which) {
-
                 dialog.dismiss();
-
             }
-
         });
 
         return builder.create();
-
     }
-
 }

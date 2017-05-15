@@ -23,9 +23,6 @@
     android:paddingBottom="10dp"
     android:paddingStart="10dp"
     android:paddingEnd="10dp"
-    android:clickable="true"
-    android:focusable="true"
-    android:background="?android:attr/selectableItemBackground"
     android:id="@+id/lvia_layout">
 
     <TextView

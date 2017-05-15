@@ -29,6 +29,7 @@ public class Activity {
     private DateTime startTime;
     private DateTime endTime;
     private ArrayList<Result> results;
+    private Location parentLocation;
 
     public Activity(int id, String name, DateTime startTime, DateTime endTime, ArrayList<Result> results) {
         this.id = id;
@@ -74,5 +75,13 @@ public class Activity {
 
     public ArrayList<Result> getResults() {
         return results;
+    }
+
+    public Location getParentLocation() {
+        return parentLocation;
+    }
+
+    public void setParentLocation(Location parentLocation) {
+        this.parentLocation = parentLocation;
     }
 }

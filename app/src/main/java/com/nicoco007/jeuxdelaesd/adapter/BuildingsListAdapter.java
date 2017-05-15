@@ -37,7 +37,6 @@ import java.util.List;
 
 public class BuildingsListAdapter extends ArrayAdapter<Location> {
     private List<Location> buildings;
-    private EventBus eventBus = EventBus.getDefault();
 
     public BuildingsListAdapter(Context context, List<Location> list) {
         super(context, 0, list);

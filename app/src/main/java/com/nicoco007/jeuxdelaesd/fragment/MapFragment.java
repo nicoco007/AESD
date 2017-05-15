@@ -17,8 +17,7 @@
 package com.nicoco007.jeuxdelaesd.fragment;
 
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.Looper;
+import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.text.TextUtils;
 import android.util.Log;
@@ -31,6 +30,8 @@ import com.mapbox.mapboxsdk.Mapbox;
 import com.mapbox.mapboxsdk.annotations.Marker;
 import com.mapbox.mapboxsdk.annotations.MarkerOptions;
 import com.mapbox.mapboxsdk.camera.CameraPosition;
+import com.mapbox.mapboxsdk.camera.CameraUpdate;
+import com.mapbox.mapboxsdk.camera.CameraUpdateFactory;
 import com.mapbox.mapboxsdk.geometry.LatLng;
 import com.mapbox.mapboxsdk.geometry.LatLngBounds;
 import com.mapbox.mapboxsdk.location.LocationSource;
@@ -44,11 +45,13 @@ import com.nicoco007.jeuxdelaesd.R;
 import com.nicoco007.jeuxdelaesd.activity.MapActivity;
 import com.nicoco007.jeuxdelaesd.events.EventListener;
 import com.nicoco007.jeuxdelaesd.events.LocationsUpdatedEventArgs;
+import com.nicoco007.jeuxdelaesd.events.ShowMapCoordsEvent;
 import com.nicoco007.jeuxdelaesd.helper.APICommunication;
 import com.nicoco007.jeuxdelaesd.model.MarkerCollection;
 import com.nicoco007.jeuxdelaesd.onlinemodel.Activity;
 
 import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.Subscribe;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -91,7 +94,26 @@ public class MapFragment extends Fragment implements PermissionsListener {
     private static final double maxLong = -79.21623229980469;
 
     public MapFragment() {
-        //eventBus.register(this);
+        eventBus.register(this);
+    }
+
+    @Subscribe
+    public void onMessageEvent(ShowMapCoordsEvent event) {
+        map.deselectMarkers();
+
+        for (Marker marker : map.getMarkers()) {
+            if (marker.getPosition().getLatitude() == event.latitude && marker.getPosition().getLongitude() == event.longitude) {
+                map.selectMarker(marker);
+
+                if (!map.getProjection().getVisibleRegion().latLngBounds.contains(marker.getPosition())) {
+                    CameraPosition position = new CameraPosition.Builder()
+                            .target(new LatLng(event.latitude, event.longitude))
+                            .build();
+
+                    map.moveCamera(CameraUpdateFactory.newCameraPosition(position));
+                }
+            }
+        }
     }
 
     @Override

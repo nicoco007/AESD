@@ -18,6 +18,7 @@ package com.nicoco007.jeuxdelaesd.fragment;
 
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentActivity;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -47,7 +48,6 @@ import java.util.Comparator;
 import java.util.Locale;
 
 public class ScheduleFragment extends Fragment {
-
     private static String TAG = "ScheduleFragment";
 
     private SwipeRefreshLayout refreshLayout;
@@ -109,6 +109,15 @@ public class ScheduleFragment extends Fragment {
             @Override
             public void handle(LocationsUpdatedEventArgs result) {
                 onLocationsUpdated(result);
+            }
+        });
+
+        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                ActivityDialogFragment dialog = new ActivityDialogFragment();
+                dialog.setActivity(adapter.getItem(position));
+                dialog.show(((FragmentActivity) getContext()).getSupportFragmentManager(), "ala_dialog_" + Long.toString(id));
             }
         });
 

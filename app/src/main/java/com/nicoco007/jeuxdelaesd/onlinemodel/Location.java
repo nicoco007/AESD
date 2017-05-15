@@ -37,6 +37,9 @@ public class Location {
         this.latitude = latitude;
         this.longitude = longitude;
         this.activities = activities;
+
+        for (Activity activity : activities)
+            activity.setParentLocation(this);
     }
 
     public static Location fromJson(JSONObject obj) {
