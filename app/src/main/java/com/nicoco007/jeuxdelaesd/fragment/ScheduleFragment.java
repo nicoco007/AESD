@@ -18,9 +18,10 @@ package com.nicoco007.jeuxdelaesd.fragment;
 
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.text.Editable;
 import android.text.TextWatcher;
-import android.util.Log;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -28,22 +29,30 @@ import android.widget.AdapterView;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.Spinner;
+import android.widget.TextView;
+import android.widget.Toast;
 
-import com.nicoco007.jeuxdelaesd.Activities;
 import com.nicoco007.jeuxdelaesd.R;
 import com.nicoco007.jeuxdelaesd.adapter.ActivitiesListAdapter;
 import com.nicoco007.jeuxdelaesd.adapter.SimpleSpinnerAdapter;
-import com.nicoco007.jeuxdelaesd.model.DayActivity;
+import com.nicoco007.jeuxdelaesd.events.EventListener;
+import com.nicoco007.jeuxdelaesd.events.LocationsUpdatedEventArgs;
+import com.nicoco007.jeuxdelaesd.helper.APICommunication;
+import com.nicoco007.jeuxdelaesd.onlinemodel.Activity;
+import com.nicoco007.jeuxdelaesd.onlinemodel.Location;
 
 import java.text.Collator;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.Locale;
 
 public class ScheduleFragment extends Fragment {
 
     private static String TAG = "ScheduleFragment";
+
+    private SwipeRefreshLayout refreshLayout;
+    private ActivitiesListAdapter adapter;
+    private Spinner sortSpinner;
 
     public ScheduleFragment() { }
 
@@ -56,7 +65,7 @@ public class ScheduleFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         final View self = inflater.inflate(R.layout.fragment_schedule, container, false);
 
-        final ActivitiesListAdapter adapter = new ActivitiesListAdapter(this.getContext(), Activities.get(getContext()));
+        adapter = new ActivitiesListAdapter(this.getContext(), new ArrayList<Activity>());
 
         final ListView listView = (ListView)self.findViewById(R.id.listview_activities);
 
@@ -72,16 +81,14 @@ public class ScheduleFragment extends Fragment {
 
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
-
                 adapter.getFilter().filter(s.toString());
-
             }
 
             @Override
             public void afterTextChanged(Editable s) {}
         });
 
-        final Spinner sortSpinner = (Spinner)self.findViewById(R.id.schedule_spinner_sort);
+        sortSpinner = (Spinner)self.findViewById(R.id.schedule_spinner_sort);
 
         ArrayList<String> items = new ArrayList<>();
         items.add("Heure de début/fin");
@@ -92,41 +99,93 @@ public class ScheduleFragment extends Fragment {
         sortSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                switch(position) {
-                    case 0:
-                        Log.i(TAG, "attempting to sort by time");
-                        Collections.sort(Activities.get(getContext()), new Comparator<DayActivity>() {
-                            @Override
-                            public int compare(DayActivity a, DayActivity b) {
-                                long startTimeSort = a.getStartTime() - b.getStartTime();
-                                if(startTimeSort != 0) return (int)startTimeSort;
-
-                                long endTimeSort = a.getEndTime() - b.getEndTime();
-                                return (int)endTimeSort;
-                            }
-                        });
-                        break;
-
-                    case 1:
-                        Collections.sort(Activities.get(getContext()), new Comparator<DayActivity>() {
-                            @Override
-                            public int compare(DayActivity a, DayActivity b) {
-                                Collator collator = Collator.getInstance(Locale.CANADA_FRENCH);
-                                collator.setStrength(Collator.PRIMARY);
-                                return collator.compare(a.getText(), b.getText());
-                            }
-                        });
-                        break;
-                }
-
-                adapter.getFilter().filter(filterText.getText());
+                sortActivities(position);
             }
-            public void onNothingSelected(AdapterView<?> parent) {
 
+            public void onNothingSelected(AdapterView<?> parent) { }
+        });
+
+        APICommunication.onLocationsUpdatedEventHandler.addListener(new EventListener<LocationsUpdatedEventArgs>() {
+            @Override
+            public void handle(LocationsUpdatedEventArgs result) {
+                onLocationsUpdated(result);
+            }
+        });
+
+        refreshLayout = (SwipeRefreshLayout) self.findViewById(R.id.swipe_container_activities);
+
+        refreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                APICommunication.loadLocations(getContext(), true);
             }
         });
 
         return self;
     }
 
+    public void onLocationsUpdated(final LocationsUpdatedEventArgs result) {
+        getActivity().runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                if (!result.isSuccessful()) {
+                    // TODO: shove in helper class
+                    Toast toast = Toast.makeText(getContext(), "Impossible de mettre à jour la liste d'activités. Veuillez vérifier votre connexion Internet puis réessayer.", Toast.LENGTH_LONG);
+                    TextView textView = (TextView) toast.getView().findViewById(android.R.id.message);
+
+                    if (textView != null)
+                        textView.setGravity(Gravity.CENTER);
+
+                    toast.show();
+
+                    refreshLayout.setRefreshing(false);
+
+                    return;
+                }
+
+                adapter.clear();
+
+                for (Location location : result.getLocations())
+                    adapter.addAll(location.getActivities());
+
+                sortActivities(sortSpinner.getSelectedItemPosition());
+
+                adapter.notifyDataSetChanged();
+                adapter.notifyDataSetInvalidated();
+
+                refreshLayout.setRefreshing(false);
+            }
+        });
+    }
+
+    private void sortActivities(int position) {
+        switch (position) {
+            case 0:
+                adapter.sort(new Comparator<Activity>() {
+                    @Override
+                    public int compare(Activity a, Activity b) {
+                        if (a.getStartTime() == b.getStartTime()) {
+                            if (a.getEndTime() == b.getEndTime()) {
+                                Collator collator = Collator.getInstance(Locale.CANADA_FRENCH);
+                                collator.setStrength(Collator.PRIMARY);
+                                return collator.compare(a.getName(), b.getName());
+                            } else {
+                                return (int) (a.getEndTime().getMillis() - b.getEndTime().getMillis());
+                            }
+                        } else {
+                            return (int) (a.getStartTime().getMillis() - b.getStartTime().getMillis());
+                        }
+                    }
+                });
+            case 1:
+                adapter.sort(new Comparator<Activity>() {
+                    @Override
+                    public int compare(Activity a, Activity b) {
+                        Collator collator = Collator.getInstance(Locale.CANADA_FRENCH);
+                        collator.setStrength(Collator.PRIMARY);
+                        return collator.compare(a.getName(), b.getName());
+                    }
+                });
+        }
+    }
 }

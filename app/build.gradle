@@ -61,6 +61,7 @@ dependencies {
 
     compile 'com.android.support:appcompat-v7:25.3.1'
     compile 'com.android.support:design:25.3.1'
+    compile 'com.android.support:support-core-ui:25.3.1'
     compile 'com.qozix:tileview:2.1.4'
     compile 'org.greenrobot:eventbus:3.0.0'
     compile 'joda-time:joda-time:2.3'

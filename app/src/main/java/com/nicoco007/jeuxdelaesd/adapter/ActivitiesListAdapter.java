@@ -17,66 +17,75 @@
 package com.nicoco007.jeuxdelaesd.adapter;
 
 import android.content.Context;
-import android.support.v4.app.FragmentActivity;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.Filter;
 import android.widget.Filterable;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.nicoco007.jeuxdelaesd.R;
-import com.nicoco007.jeuxdelaesd.fragment.ActivityDialogFragment;
-import com.nicoco007.jeuxdelaesd.model.DayActivity;
-
-import org.joda.time.DateTime;
-import org.joda.time.DateTimeZone;
+import com.nicoco007.jeuxdelaesd.onlinemodel.Activity;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Locale;
 
-public class ActivitiesListAdapter extends ArrayAdapter<DayActivity> implements Filterable {
+public class ActivitiesListAdapter extends ArrayAdapter<Activity> implements Filterable {
+    private static final String TAG = "ActivitiesListAdapter";
 
-    private List<DayActivity> allItems;
-    private List<DayActivity> currentItems = new ArrayList<>();
+    private List<Activity> allItems;
+    private List<Activity> currentItems = new ArrayList<>();
 
     private final ActivitiesFilter filter = new ActivitiesFilter();
 
-    public ActivitiesListAdapter(Context context, List<DayActivity> list) {
-
+    public ActivitiesListAdapter(Context context, List<Activity> list) {
         super(context, 0, list);
+
         this.allItems = list;
         this.currentItems.addAll(list);
-
     }
 
     @Override
     public int getCount() {
-
         return currentItems.size();
-
     }
 
     @Override
-    public DayActivity getItem(int location) {
-
+    public Activity getItem(int location) {
         return currentItems.get(location);
-
     }
 
     public long getItemId(int location) {
-
         return currentItems.get(location).hashCode();
-
     }
 
     @Override
-    public View getView(int position, View convertView, ViewGroup parent) {
+    public void add(@Nullable Activity object) {
+        allItems.add(object);
+        filter.refresh();
+    }
 
-        final DayActivity item = getItem(position);
+    @Override
+    public void addAll(@NonNull Collection<? extends Activity> collection) {
+        allItems.addAll(collection);
+        filter.refresh();
+    }
+
+    @Override
+    public void clear() {
+        allItems.clear();
+        filter.refresh();
+    }
+
+    @NonNull
+    @Override
+    public View getView(int position, View convertView, @NonNull ViewGroup parent) {
+        final Activity item = getItem(position);
 
         View view;
 
@@ -86,25 +95,22 @@ public class ActivitiesListAdapter extends ArrayAdapter<DayActivity> implements 
             view = convertView;
         }
 
-        final int id = view.hashCode();
-
         TextView itemName = (TextView)view.findViewById(R.id.lvia_activity);
         TextView itemTime = (TextView)view.findViewById(R.id.lvia_time);
 
-        itemName.setText(item.getText());
-
-        DateTimeZone timeZone = DateTimeZone.getDefault();
-        DateTime localStartTime = new DateTime(item.getStartTime()).withZone(timeZone);
-        DateTime localEndTime = new DateTime(item.getEndTime()).withZone(timeZone);
+        itemName.setText(item.getName());
 
         itemTime.setText(String.format(
                 Locale.CANADA_FRENCH,
                 getContext().getString(R.string.activity_time),
-                localStartTime.getHourOfDay(),
-                localStartTime.getMinuteOfHour(),
-                localEndTime.getHourOfDay(),
-                localEndTime.getMinuteOfHour()
+                item.getStartTime().getHourOfDay(),
+                item.getStartTime().getMinuteOfHour(),
+                item.getEndTime().getHourOfDay(),
+                item.getEndTime().getMinuteOfHour()
         ));
+
+        /*
+        final int id = view.hashCode();
 
         final RelativeLayout layout = (RelativeLayout)view.findViewById(R.id.lvia_layout);
 
@@ -117,75 +123,60 @@ public class ActivitiesListAdapter extends ArrayAdapter<DayActivity> implements 
             }
         });
 
-        item.setView(view.findViewById(R.id.lvia_image_timer));
+        item.setView(view.findViewById(R.id.lvia_image_timer));*/
 
         return view;
-
     }
 
+    @NonNull
     public Filter getFilter() {
-
         return filter;
-
     }
 
     private class ActivitiesFilter extends Filter {
+        private CharSequence prevConstraint;
+
+        protected void refresh() {
+            filter(prevConstraint);
+        }
 
         @Override
         @SuppressWarnings("unchecked")
         protected FilterResults performFiltering(CharSequence constraint) {
+            prevConstraint = constraint;
 
             FilterResults results = new FilterResults();
 
-            if(constraint == null || constraint.length() == 0) {
-
+            if (constraint == null || constraint.length() == 0) {
                 results.values = allItems;
                 results.count = allItems.size();
-
             } else {
+                ArrayList<Activity> filteredItems = new ArrayList<>();
 
-                ArrayList<DayActivity> filteredItems = new ArrayList<>();
-
-                for(DayActivity item : allItems) {
-
-                    if(item.getText().toLowerCase().contains(constraint.toString().toLowerCase())) {
-
+                for(Activity item : allItems)
+                    if(item.getName().toLowerCase().contains(constraint.toString().toLowerCase()))
                         filteredItems.add(item);
-
-                    }
-
-                }
 
                 results.values = filteredItems;
                 results.count = filteredItems.size();
-
             }
 
             return results;
-
         }
 
         @Override
         @SuppressWarnings("unchecked")
         protected void publishResults(CharSequence constraint, FilterResults results) {
-
             currentItems.clear();
 
             if(results.count > 0) {
-
                 if(results.values instanceof ArrayList<?>)
-                    currentItems.addAll((ArrayList<DayActivity>)results.values);
+                    currentItems.addAll((ArrayList<Activity>) results.values);
 
                 notifyDataSetChanged();
-
             } else {
-
                 notifyDataSetInvalidated();
-
             }
-
         }
-
     }
-
 }

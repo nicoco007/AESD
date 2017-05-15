@@ -17,14 +17,18 @@
 package com.nicoco007.jeuxdelaesd.fragment;
 
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
 import android.support.v4.app.Fragment;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
 
 import com.mapbox.mapboxsdk.Mapbox;
+import com.mapbox.mapboxsdk.annotations.Marker;
 import com.mapbox.mapboxsdk.annotations.MarkerOptions;
 import com.mapbox.mapboxsdk.camera.CameraPosition;
 import com.mapbox.mapboxsdk.geometry.LatLng;
@@ -37,7 +41,9 @@ import com.mapbox.services.android.telemetry.location.LocationEngine;
 import com.mapbox.services.android.telemetry.permissions.PermissionsListener;
 import com.mapbox.services.android.telemetry.permissions.PermissionsManager;
 import com.nicoco007.jeuxdelaesd.R;
+import com.nicoco007.jeuxdelaesd.activity.MapActivity;
 import com.nicoco007.jeuxdelaesd.events.EventListener;
+import com.nicoco007.jeuxdelaesd.events.LocationsUpdatedEventArgs;
 import com.nicoco007.jeuxdelaesd.helper.APICommunication;
 import com.nicoco007.jeuxdelaesd.model.MarkerCollection;
 import com.nicoco007.jeuxdelaesd.onlinemodel.Activity;
@@ -95,6 +101,8 @@ public class MapFragment extends Fragment implements PermissionsListener {
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        Log.d(TAG, "onCreateView");
+
         // init with access token - we need to do this now or inflating will fail
         Mapbox.getInstance(getContext(), getString(R.string.mapbox_access_token));
 
@@ -105,25 +113,19 @@ public class MapFragment extends Fragment implements PermissionsListener {
         locationEngine = LocationSource.getLocationEngine(getContext());
         locationEngine.activate();
 
-        /*MapboxMapOptions options = new MapboxMapOptions()
-                .styleUrl(Style.SATELLITE)
-                .locationEnabled(true)
-                .camera(new CameraPosition.Builder()
-                        .target(new LatLng((minLat + maxLat) / 2, (minLong + maxLong) / 2))
-                        .zoom(16)
-                        .build());*/
-
         mapView = (MapView) self.findViewById(R.id.mapview);
         mapView.onCreate(savedInstanceState);
 
         mapView.getMapAsync(new OnMapReadyCallback() {
             @Override
             public void onMapReady(MapboxMap mapboxMap) {
+                Log.d(TAG, "onMapReady");
+
                 map = mapboxMap;
 
                 map.setCameraPosition(new CameraPosition.Builder()
                         .target(new LatLng((minLat + maxLat) / 2, (minLong + maxLong) / 2))
-                        .zoom(16)
+                        .zoom(15)
                         .build());
 
                 // doesnt work in options for some reason
@@ -135,36 +137,49 @@ public class MapFragment extends Fragment implements PermissionsListener {
 
                 enableLocation();
 
-                APICommunication.loadLocations();
+                APICommunication.loadLocations(getContext());
             }
         });
 
-        APICommunication.onLocationsUpdatedEventHandler.addListener(new EventListener<ArrayList<com.nicoco007.jeuxdelaesd.onlinemodel.Location>>() {
+        APICommunication.onLocationsUpdatedEventHandler.addListener(new EventListener<LocationsUpdatedEventArgs>() {
             @Override
-            public void handle(ArrayList<com.nicoco007.jeuxdelaesd.onlinemodel.Location> result) {
-                for (com.nicoco007.jeuxdelaesd.onlinemodel.Location location : result) {
-                    addMarker(location);
-                }
+            public void handle(LocationsUpdatedEventArgs result) {
+                onLocationsUpdated(result);
             }
         });
 
         return self;
     }
 
-    private void addMarker(com.nicoco007.jeuxdelaesd.onlinemodel.Location location) {
-        if (map != null) {
-            ArrayList<String> activityNames = new ArrayList<>();
+    private void onLocationsUpdated(LocationsUpdatedEventArgs result) {
+        if (!result.isSuccessful())
+            return;
 
-            for (Activity activity : location.getActivities()) {
-                activityNames.add(activity.getName());
+        // make sure we can actually modify the map
+        if (map != null && isAdded()) {
+
+            // remove all markers
+            map.clear();
+
+            // iterate through locations
+            for (com.nicoco007.jeuxdelaesd.onlinemodel.Location location : result.getLocations()) {
+                ArrayList<String> activityNames = new ArrayList<>();
+
+                for (Activity activity : location.getActivities())
+                    activityNames.add("\u2022 " + activity.getName());
+
+                String snippet = TextUtils.join("\n", activityNames);
+
+                LatLng pos = new LatLng(location.getLatitude(), location.getLongitude());
+                String title = location.getName();
+
+                MarkerOptions options = new MarkerOptions()
+                        .position(pos)
+                        .title(title)
+                        .snippet(snippet);
+
+                map.addMarker(options);
             }
-
-            String snippet = TextUtils.join("\n", activityNames);
-
-            map.addMarker(new MarkerOptions()
-                    .position(new LatLng(location.getLatitude(), location.getLongitude()))
-                    .title(location.getName())
-                    .snippet(snippet));
         }
     }
 

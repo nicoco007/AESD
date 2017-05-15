@@ -6,28 +6,19 @@ import android.os.Bundle;
 import android.os.Handler;
 
 import com.nicoco007.jeuxdelaesd.R;
+import com.nicoco007.jeuxdelaesd.helper.APICommunication;
 
 public class SplashActivity extends Activity {
-
     @Override
     public void onCreate(Bundle savedInstanceState) {
-
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.splash);
 
-        new Handler().postDelayed(new Runnable() {
+        // load locations before we show anything
+        APICommunication.loadLocations(this);
 
-            @Override
-            public void run() {
-
-                Intent i = new Intent(SplashActivity.this, MapActivity.class);
-                startActivity(i);
-                finish();
-
-            }
-
-        }, 3000);
-
+        // start main activity
+        Intent intent = new Intent(this, MapActivity.class);
+        startActivity(intent);
+        finish();
     }
-
 }

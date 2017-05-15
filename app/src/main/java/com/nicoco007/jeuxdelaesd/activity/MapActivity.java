@@ -21,6 +21,8 @@ import android.content.Context;
 import android.os.Bundle;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
@@ -44,10 +46,11 @@ public class MapActivity extends AesdActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        APICommunication.loadLocations(true);
+        super.onCreate(savedInstanceState);
+
+        APICommunication.loadLocations(this, true);
 
         // set up activity
-        super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_map);
         super.initDrawer();
 
@@ -60,7 +63,6 @@ public class MapActivity extends AesdActivity {
         TabLayout tabLayout = (TabLayout)findViewById(R.id.tabs_activities);
 
         if (viewPager != null && tabLayout != null) {
-
             // create fragments for viewpager
             Fragment mapFragment = new MapFragment();
             Fragment scheduleFragment = new ScheduleFragment();
@@ -82,13 +84,11 @@ public class MapActivity extends AesdActivity {
 
             // get TabLayout and set it up with ViewPager
             tabLayout.setupWithViewPager(viewPager);
-
         }
 
         // register EventBus
         EventBus eventBus = EventBus.getDefault();
         eventBus.register(this);
-
     }
 
     @Override
