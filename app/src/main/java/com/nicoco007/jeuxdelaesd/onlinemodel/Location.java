@@ -25,12 +25,12 @@ import java.util.ArrayList;
 public class Location {
     private int id;
     private String name;
-    private ActivityType type;
+    private LocationType type;
     private double latitude;
     private double longitude;
     private ArrayList<Activity> activities;
 
-    public Location(int id, String name, ActivityType type, double latitude, double longitude, ArrayList<Activity> activities) {
+    public Location(int id, String name, LocationType type, double latitude, double longitude, ArrayList<Activity> activities) {
         this.id = id;
         this.name = name;
         this.type = type;
@@ -54,7 +54,7 @@ public class Location {
             location = new Location(
                     obj.getInt("id"),
                     obj.getString("name"),
-                    ActivityType.values()[obj.getInt("type")],
+                    LocationType.values()[obj.getInt("type")],
                     obj.getDouble("latitude"),
                     obj.getDouble("longitude"),
                     activities
@@ -74,7 +74,7 @@ public class Location {
         return name;
     }
 
-    public ActivityType getType() {
+    public LocationType getType() {
         return type;
     }
 

@@ -16,12 +16,12 @@
 
 package com.nicoco007.jeuxdelaesd.onlinemodel;
 
-public enum ActivityType {
+public enum LocationType {
     ACTIVITY (0), CAMP (1), OTHER (2);
 
     private final int id;
 
-    ActivityType(int id) {
+    LocationType(int id) {
         this.id = id;
     }
 

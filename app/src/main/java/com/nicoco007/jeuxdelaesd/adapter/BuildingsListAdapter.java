@@ -18,6 +18,7 @@ package com.nicoco007.jeuxdelaesd.adapter;
 
 import android.content.Context;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -27,16 +28,18 @@ import android.widget.TextView;
 import com.nicoco007.jeuxdelaesd.R;
 import com.nicoco007.jeuxdelaesd.events.ShowMapCoordsEvent;
 import com.nicoco007.jeuxdelaesd.model.MarkerInfo;
+import com.nicoco007.jeuxdelaesd.onlinemodel.Location;
 
 import org.greenrobot.eventbus.EventBus;
 
+import java.util.Collection;
 import java.util.List;
 
-public class BuildingsListAdapter extends ArrayAdapter<MarkerInfo> {
-    private List<MarkerInfo> buildings;
+public class BuildingsListAdapter extends ArrayAdapter<Location> {
+    private List<Location> buildings;
     private EventBus eventBus = EventBus.getDefault();
 
-    public BuildingsListAdapter(Context context, List<MarkerInfo> list) {
+    public BuildingsListAdapter(Context context, List<Location> list) {
         super(context, 0, list);
         this.buildings = list;
     }
@@ -47,7 +50,7 @@ public class BuildingsListAdapter extends ArrayAdapter<MarkerInfo> {
     }
 
     @Override
-    public MarkerInfo getItem(int location) {
+    public Location getItem(int location) {
         return buildings.get(location);
     }
 
@@ -55,10 +58,28 @@ public class BuildingsListAdapter extends ArrayAdapter<MarkerInfo> {
         return buildings.get(location).hashCode();
     }
 
+    @Override
+    public void add(@Nullable Location object) {
+        buildings.add(object);
+        notifyDataSetChanged();
+    }
+
+    @Override
+    public void addAll(@NonNull Collection<? extends Location> collection) {
+        buildings.addAll(collection);
+        notifyDataSetChanged();
+    }
+
+    @Override
+    public void clear() {
+        buildings.clear();
+        notifyDataSetChanged();
+    }
+
     @NonNull
     @Override
     public View getView(int position, View convertView, @NonNull ViewGroup parent) {
-        final MarkerInfo item = getItem(position);
+        final Location item = getItem(position);
 
         View view;
 
@@ -72,12 +93,12 @@ public class BuildingsListAdapter extends ArrayAdapter<MarkerInfo> {
 
         textView.setText(item.getName());
 
-        view.setOnClickListener(new View.OnClickListener() {
+        /*view.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                eventBus.post(new ShowMapCoordsEvent(item.getCoordinates()));
+                eventBus.post(new ShowMapCoordsEvent(item.getLatitude(), item.getLongitude()));
             }
-        });
+        });*/
 
         return view;
     }

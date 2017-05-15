@@ -26,7 +26,12 @@ import android.widget.ListView;
 import com.nicoco007.jeuxdelaesd.Markers;
 import com.nicoco007.jeuxdelaesd.R;
 import com.nicoco007.jeuxdelaesd.adapter.BuildingsListAdapter;
+import com.nicoco007.jeuxdelaesd.events.EventListener;
+import com.nicoco007.jeuxdelaesd.events.LocationsUpdatedEventArgs;
+import com.nicoco007.jeuxdelaesd.helper.APICommunication;
 import com.nicoco007.jeuxdelaesd.model.MarkerInfo;
+import com.nicoco007.jeuxdelaesd.onlinemodel.Location;
+import com.nicoco007.jeuxdelaesd.onlinemodel.LocationType;
 
 import java.text.Collator;
 import java.util.ArrayList;
@@ -35,6 +40,7 @@ import java.util.Comparator;
 import java.util.Locale;
 
 public class BuildingsFragment extends Fragment {
+    private BuildingsListAdapter adapter;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -43,10 +49,9 @@ public class BuildingsFragment extends Fragment {
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-
         final View self = inflater.inflate(R.layout.fragment_buildings, container, false);
 
-        ArrayList<MarkerInfo> buildings = new ArrayList<>();
+        /*ArrayList<MarkerInfo> buildings = new ArrayList<>();
 
         buildings.add(Markers.CAFETERIA);
         buildings.add(Markers.GENERAL_QUARTERS);
@@ -72,16 +77,40 @@ public class BuildingsFragment extends Fragment {
                 collator.setStrength(Collator.PRIMARY);
                 return collator.compare(a.getName(), b.getName());
             }
-        });
+        });*/
 
-        BuildingsListAdapter listAdapter = new BuildingsListAdapter(getContext(), buildings);
+        adapter = new BuildingsListAdapter(getContext(), new ArrayList<Location>());
 
         ListView buildingsListView = (ListView)self.findViewById(R.id.listview_buildings);
 
-        buildingsListView.setAdapter(listAdapter);
+        buildingsListView.setAdapter(adapter);
+
+        APICommunication.onLocationsUpdatedEventHandler.addListener(new EventListener<LocationsUpdatedEventArgs>() {
+            @Override
+            public void handle(LocationsUpdatedEventArgs result) {
+                onLocationsUpdated(result);
+            }
+        });
 
         return self;
-
     }
 
+    private void onLocationsUpdated(final LocationsUpdatedEventArgs result) {
+        if (isAdded() && result.isSuccessful()) {
+            getActivity().runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    adapter.clear();
+
+                    ArrayList<Location> locations = new ArrayList<>();
+
+                    for (Location location : result.getLocations())
+                        if (location.getType() == LocationType.CAMP || location.getType() == LocationType.OTHER)
+                            locations.add(location);
+
+                    adapter.addAll(locations);
+                }
+            });
+        }
+    }
 }
