@@ -125,37 +125,39 @@ public class ScheduleFragment extends Fragment {
     }
 
     public void onLocationsUpdated(final LocationsUpdatedEventArgs result) {
-        getActivity().runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                if (!result.isSuccessful()) {
-                    // TODO: shove in helper class
-                    Toast toast = Toast.makeText(getContext(), "Impossible de mettre à jour la liste d'activités. Veuillez vérifier votre connexion Internet puis réessayer.", Toast.LENGTH_LONG);
-                    TextView textView = (TextView) toast.getView().findViewById(android.R.id.message);
+        if (isAdded()) {
+            getActivity().runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    if (!result.isSuccessful()) {
+                        // TODO: shove in helper class
+                        Toast toast = Toast.makeText(getContext(), "Impossible de mettre à jour la liste d'activités. Veuillez vérifier votre connexion Internet puis réessayer.", Toast.LENGTH_LONG);
+                        TextView textView = (TextView) toast.getView().findViewById(android.R.id.message);
 
-                    if (textView != null)
-                        textView.setGravity(Gravity.CENTER);
+                        if (textView != null)
+                            textView.setGravity(Gravity.CENTER);
 
-                    toast.show();
+                        toast.show();
+
+                        refreshLayout.setRefreshing(false);
+
+                        return;
+                    }
+
+                    adapter.clear();
+
+                    for (Location location : result.getLocations())
+                        adapter.addAll(location.getActivities());
+
+                    sortActivities(sortSpinner.getSelectedItemPosition());
+
+                    adapter.notifyDataSetChanged();
+                    adapter.notifyDataSetInvalidated();
 
                     refreshLayout.setRefreshing(false);
-
-                    return;
                 }
-
-                adapter.clear();
-
-                for (Location location : result.getLocations())
-                    adapter.addAll(location.getActivities());
-
-                sortActivities(sortSpinner.getSelectedItemPosition());
-
-                adapter.notifyDataSetChanged();
-                adapter.notifyDataSetInvalidated();
-
-                refreshLayout.setRefreshing(false);
-            }
-        });
+            });
+        }
     }
 
     private void sortActivities(int position) {
