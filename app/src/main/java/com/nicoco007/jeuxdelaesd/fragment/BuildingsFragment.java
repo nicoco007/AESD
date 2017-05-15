@@ -51,37 +51,9 @@ public class BuildingsFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         final View self = inflater.inflate(R.layout.fragment_buildings, container, false);
 
-        /*ArrayList<MarkerInfo> buildings = new ArrayList<>();
-
-        buildings.add(Markers.CAFETERIA);
-        buildings.add(Markers.GENERAL_QUARTERS);
-        buildings.add(Markers.ACADEMIE_CATHOLIQUE_MERE_TERESA);
-        buildings.add(Markers.JEAN_VANIER);
-        buildings.add(Markers.MONSEIGNEUR_DE_CHARBONNEL);
-        buildings.add(Markers.NOUVELLE_ALLIANCE);
-        buildings.add(Markers.PERE_RENE_DE_GALINEE);
-        buildings.add(Markers.RENAISSANCE);
-        buildings.add(Markers.SAINT_CHARLES_GARNIER);
-        buildings.add(Markers.SAINT_FRERE_ANDRE);
-        buildings.add(Markers.SAINTE_FAMILLE);
-        buildings.add(Markers.SAINTE_TRINITE);
-        buildings.add(Markers.CONVENIENCE_STORE);
-        buildings.add(Markers.INFIRMARY);
-        buildings.add(Markers.REFEREE_TENT);
-        buildings.add(Markers.TEACHERS_LOUNGE);
-
-        Collections.sort(buildings, new Comparator<MarkerInfo>() {
-            @Override
-            public int compare(MarkerInfo a, MarkerInfo b) {
-                Collator collator = Collator.getInstance(Locale.CANADA_FRENCH);
-                collator.setStrength(Collator.PRIMARY);
-                return collator.compare(a.getName(), b.getName());
-            }
-        });*/
-
         adapter = new BuildingsListAdapter(getContext(), new ArrayList<Location>());
 
-        ListView buildingsListView = (ListView)self.findViewById(R.id.listview_buildings);
+        ListView buildingsListView = (ListView) self.findViewById(R.id.listview_buildings);
 
         buildingsListView.setAdapter(adapter);
 
