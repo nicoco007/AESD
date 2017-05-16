@@ -24,24 +24,18 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ListView;
 
-import com.nicoco007.jeuxdelaesd.Markers;
 import com.nicoco007.jeuxdelaesd.R;
 import com.nicoco007.jeuxdelaesd.adapter.BuildingsListAdapter;
 import com.nicoco007.jeuxdelaesd.events.EventListener;
 import com.nicoco007.jeuxdelaesd.events.LocationsUpdatedEventArgs;
 import com.nicoco007.jeuxdelaesd.events.ShowMapCoordsEvent;
 import com.nicoco007.jeuxdelaesd.helper.APICommunication;
-import com.nicoco007.jeuxdelaesd.model.MarkerInfo;
 import com.nicoco007.jeuxdelaesd.onlinemodel.Location;
 import com.nicoco007.jeuxdelaesd.onlinemodel.LocationType;
 
 import org.greenrobot.eventbus.EventBus;
 
-import java.text.Collator;
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.Locale;
 
 public class BuildingsFragment extends Fragment {
     private BuildingsListAdapter adapter;

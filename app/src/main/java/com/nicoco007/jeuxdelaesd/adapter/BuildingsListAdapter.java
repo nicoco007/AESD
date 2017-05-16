@@ -26,11 +26,7 @@ import android.widget.ArrayAdapter;
 import android.widget.TextView;
 
 import com.nicoco007.jeuxdelaesd.R;
-import com.nicoco007.jeuxdelaesd.events.ShowMapCoordsEvent;
-import com.nicoco007.jeuxdelaesd.model.MarkerInfo;
 import com.nicoco007.jeuxdelaesd.onlinemodel.Location;
-
-import org.greenrobot.eventbus.EventBus;
 
 import java.util.Collection;
 import java.util.List;

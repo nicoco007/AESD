@@ -17,7 +17,6 @@
 package com.nicoco007.jeuxdelaesd.fragment;
 
 import android.os.Bundle;
-import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.text.TextUtils;
 import android.util.Log;
@@ -30,7 +29,6 @@ import com.mapbox.mapboxsdk.Mapbox;
 import com.mapbox.mapboxsdk.annotations.Marker;
 import com.mapbox.mapboxsdk.annotations.MarkerOptions;
 import com.mapbox.mapboxsdk.camera.CameraPosition;
-import com.mapbox.mapboxsdk.camera.CameraUpdate;
 import com.mapbox.mapboxsdk.camera.CameraUpdateFactory;
 import com.mapbox.mapboxsdk.geometry.LatLng;
 import com.mapbox.mapboxsdk.geometry.LatLngBounds;
@@ -41,13 +39,12 @@ import com.mapbox.mapboxsdk.maps.OnMapReadyCallback;
 import com.mapbox.services.android.telemetry.location.LocationEngine;
 import com.mapbox.services.android.telemetry.permissions.PermissionsListener;
 import com.mapbox.services.android.telemetry.permissions.PermissionsManager;
+
 import com.nicoco007.jeuxdelaesd.R;
-import com.nicoco007.jeuxdelaesd.activity.MapActivity;
 import com.nicoco007.jeuxdelaesd.events.EventListener;
 import com.nicoco007.jeuxdelaesd.events.LocationsUpdatedEventArgs;
 import com.nicoco007.jeuxdelaesd.events.ShowMapCoordsEvent;
 import com.nicoco007.jeuxdelaesd.helper.APICommunication;
-import com.nicoco007.jeuxdelaesd.model.MarkerCollection;
 import com.nicoco007.jeuxdelaesd.onlinemodel.Activity;
 
 import org.greenrobot.eventbus.EventBus;
@@ -58,19 +55,10 @@ import java.util.List;
 
 public class MapFragment extends Fragment implements PermissionsListener {
 
-    public static final int REQUEST_PERMISSION_GPS = 1;
     public static final String TAG = "MapFragment";
-
-    private View self;                                          // save current view into variable
-    private EventBus eventBus = EventBus.getDefault();          // eventbus for focusing a point
-    private MarkerCollection markers = new MarkerCollection();  // tileview markers
 
     private MapView mapView;
     private MapboxMap map;
-
-    private LocationEngine locationEngine;
-
-    private static final int PERMISSIONS_LOCATION = 0;
 
     /**
      * school
@@ -94,20 +82,21 @@ public class MapFragment extends Fragment implements PermissionsListener {
     private static final double maxLong = -79.21623229980469;
 
     public MapFragment() {
+        EventBus eventBus = EventBus.getDefault();
         eventBus.register(this);
     }
 
     @Subscribe
-    public void onMessageEvent(ShowMapCoordsEvent event) {
+    public void onShowMapCoordsEvent(ShowMapCoordsEvent event) {
         map.deselectMarkers();
 
         for (Marker marker : map.getMarkers()) {
-            if (marker.getPosition().getLatitude() == event.latitude && marker.getPosition().getLongitude() == event.longitude) {
+            if (marker.getPosition().getLatitude() == event.getPosition().getLatitude() && marker.getPosition().getLongitude() == event.getPosition().getLongitude()) {
                 map.selectMarker(marker);
 
                 if (!map.getProjection().getVisibleRegion().latLngBounds.contains(marker.getPosition())) {
                     CameraPosition position = new CameraPosition.Builder()
-                            .target(new LatLng(event.latitude, event.longitude))
+                            .target(event.getPosition())
                             .build();
 
                     map.moveCamera(CameraUpdateFactory.newCameraPosition(position));
@@ -129,10 +118,10 @@ public class MapFragment extends Fragment implements PermissionsListener {
         Mapbox.getInstance(getContext(), getString(R.string.mapbox_access_token));
 
         // inflate view
-        self = inflater.inflate(R.layout.fragment_map, container, false);
+        View self = inflater.inflate(R.layout.fragment_map, container, false);
 
         // get location engine object for later use
-        locationEngine = LocationSource.getLocationEngine(getContext());
+        LocationEngine locationEngine = LocationSource.getLocationEngine(getContext());
         locationEngine.activate();
 
         mapView = (MapView) self.findViewById(R.id.mapview);

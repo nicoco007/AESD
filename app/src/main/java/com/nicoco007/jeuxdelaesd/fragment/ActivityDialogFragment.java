@@ -23,7 +23,6 @@ import android.support.annotation.NonNull;
 import android.support.v4.app.DialogFragment;
 import android.support.v7.app.AlertDialog;
 import android.view.View;
-import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.Spinner;
 import android.widget.TextView;
@@ -31,7 +30,6 @@ import android.widget.TextView;
 import com.nicoco007.jeuxdelaesd.R;
 import com.nicoco007.jeuxdelaesd.adapter.SimpleSpinnerAdapter;
 import com.nicoco007.jeuxdelaesd.events.ShowMapCoordsEvent;
-import com.nicoco007.jeuxdelaesd.model.DayActivity;
 import com.nicoco007.jeuxdelaesd.onlinemodel.Activity;
 
 import org.greenrobot.eventbus.EventBus;

@@ -16,29 +16,20 @@
 
 package com.nicoco007.jeuxdelaesd.events;
 
-/*public class TextChangedEvent {
-    public String newText;
-    public TextChangedEvent(String newText) {
-        this.newText = newText;
-    }
-}*/
-
-import com.nicoco007.jeuxdelaesd.model.Coordinates;
+import com.mapbox.mapboxsdk.geometry.LatLng;
 
 public class ShowMapCoordsEvent {
-    public double latitude;
-    public double longitude;
+    private LatLng position;
 
-    public ShowMapCoordsEvent(Coordinates coordinates) {
-
-        this(coordinates.latitude, coordinates.longitude);
-
+    public ShowMapCoordsEvent(LatLng position) {
+        this.position = position;
     }
 
     public ShowMapCoordsEvent(double latitude, double longitude) {
+        this(new LatLng(latitude, longitude));
+    }
 
-        this.latitude = latitude;
-        this.longitude = longitude;
-
+    public LatLng getPosition() {
+        return position;
     }
 }
