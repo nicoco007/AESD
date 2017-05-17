@@ -23,25 +23,17 @@ import java.util.Locale;
 import java.util.TimeZone;
 
 public class TimeHelper {
-
     public static long getUtcTimeDifference(String date) throws ParseException {
-
         Date enddate = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss zzz", Locale.CANADA_FRENCH).parse(date);
 
         return enddate.getTime() - System.currentTimeMillis();
-
     }
 
     public static long getUtcTimeDifference(long time) {
-
         return time - System.currentTimeMillis();
-
     }
 
     public static long getLocalTimeFromUtc(long utcTime) {
-
         return utcTime + TimeZone.getDefault().getOffset(new Date().getTime());
-
     }
-
 }

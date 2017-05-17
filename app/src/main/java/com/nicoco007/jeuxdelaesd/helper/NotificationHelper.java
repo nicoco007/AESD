@@ -16,26 +16,60 @@
 
 package com.nicoco007.jeuxdelaesd.helper;
 
+import android.app.AlarmManager;
 import android.app.Notification;
+import android.app.PendingIntent;
 import android.content.Context;
+import android.content.Intent;
 import android.media.RingtoneManager;
 import android.net.Uri;
 import android.support.v4.app.NotificationCompat;
+import android.util.Log;
 
 import com.nicoco007.jeuxdelaesd.R;
+import com.nicoco007.jeuxdelaesd.receiver.NotificationPublisher;
+
+import org.joda.time.DateTime;
 
 public class NotificationHelper {
+    private static final String TAG = "NotificationHelper";
+
     public static Notification createNotification(Context context, String title, String content) {
+        Uri alarmSound = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
+
         NotificationCompat.Builder builder = new NotificationCompat.Builder(context)
                 .setContentTitle(title)
                 .setContentText(content)
                 .setSmallIcon(R.mipmap.ic_launcher) // TODO: dedicated notification icon
                 .setVibrate(new long[] { 1000, 1000, 1000, 1000, 1000 })
-                .setLights(0xFFFFFFFF, 3000, 3000);
-
-        Uri alarmSound = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
-        builder.setSound(alarmSound);
+                .setLights(0xFF0B2F7C, 3000, 3000)
+                .setSound(alarmSound);
 
         return builder.build();
+    }
+
+    public static Notification getNotification(Context context, int notificationId) {
+        AlarmManager alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
+
+        Intent notificationIntent = new Intent(context, NotificationPublisher.class);
+
+        PendingIntent intent = PendingIntent.getBroadcast(context, notificationId, notificationIntent, PendingIntent.FLAG_NO_CREATE);
+
+        Log.i(TAG, "Intent exists: " + (intent != null));
+        Log.i(TAG, "Intent: " + intent);
+
+        return new Notification();
+    }
+
+    public static void scheduleNotification(Context context, Notification notification, int notificationId, long triggerAtMillis) {
+        Intent notificationIntent = new Intent(context, NotificationPublisher.class);
+
+        notificationIntent.putExtra(NotificationPublisher.NOTIFICATION, notification);
+        notificationIntent.putExtra(NotificationPublisher.NOTIFICATION_ID, notificationId);
+
+        PendingIntent pendingIntent = PendingIntent.getBroadcast(context, notificationId, notificationIntent, PendingIntent.FLAG_CANCEL_CURRENT);
+
+        AlarmManager alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
+        alarmManager.set(AlarmManager.ELAPSED_REALTIME_WAKEUP, triggerAtMillis, pendingIntent);
     }
 }
