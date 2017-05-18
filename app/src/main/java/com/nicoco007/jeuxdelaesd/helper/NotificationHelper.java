@@ -28,6 +28,7 @@ import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 
 import com.nicoco007.jeuxdelaesd.R;
+import com.nicoco007.jeuxdelaesd.activity.MapActivity;
 import com.nicoco007.jeuxdelaesd.receiver.NotificationPublisher;
 
 import org.joda.time.DateTime;
@@ -52,13 +53,19 @@ public class NotificationHelper {
     public static Notification createNotification(Context context, String title, String content) {
         Uri alarmSound = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
 
+        Intent notificationIntent = new Intent(context, MapActivity.class);
+        notificationIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
+
+        PendingIntent pendingIntent = PendingIntent.getActivity(context, 0, notificationIntent, 0);
+
         NotificationCompat.Builder builder = new NotificationCompat.Builder(context)
                 .setContentTitle(title)
                 .setContentText(content)
                 .setSmallIcon(R.mipmap.ic_notify)
                 .setVibrate(new long[] { 1000, 1000, 1000, 1000, 1000 })
                 .setLights(0xFF0B2F7C, 3000, 3000)
-                .setSound(alarmSound);
+                .setSound(alarmSound)
+                .setContentIntent(pendingIntent);
 
         return builder.build();
     }
@@ -68,6 +75,9 @@ public class NotificationHelper {
 
         notificationIntent.putExtra(NotificationPublisher.NOTIFICATION, notification);
         notificationIntent.putExtra(NotificationPublisher.NOTIFICATION_ID, notificationId);
+
+        notificationIntent.setAction(Intent.ACTION_VIEW);
+        notificationIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
 
         PendingIntent pendingIntent = PendingIntent.getBroadcast(context, notificationId, notificationIntent, PendingIntent.FLAG_UPDATE_CURRENT);
 

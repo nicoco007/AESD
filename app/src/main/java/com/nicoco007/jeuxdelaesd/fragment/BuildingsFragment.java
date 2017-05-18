@@ -42,11 +42,6 @@ public class BuildingsFragment extends Fragment {
     private EventBus eventBus = EventBus.getDefault();
 
     @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-    }
-
-    @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         final View self = inflater.inflate(R.layout.fragment_buildings, container, false);
 

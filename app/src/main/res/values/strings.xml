@@ -49,4 +49,6 @@
     <string name="trophy">Trophée</string>
     <string name="results">Résultats</string>
     <string name="no_results">Aucun résultat publié.</string>
+    <string name="loading">Chargement&#8230;</string>
+    <string name="searching_for_location">Recherche de votre emplacement&#8230;</string>
 </resources>

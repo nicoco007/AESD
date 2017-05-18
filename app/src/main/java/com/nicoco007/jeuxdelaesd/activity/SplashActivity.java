@@ -19,9 +19,7 @@ package com.nicoco007.jeuxdelaesd.activity;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
-import android.os.Handler;
 
-import com.nicoco007.jeuxdelaesd.R;
 import com.nicoco007.jeuxdelaesd.helper.APICommunication;
 
 public class SplashActivity extends Activity {

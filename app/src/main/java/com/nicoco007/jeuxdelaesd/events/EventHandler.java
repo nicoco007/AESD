@@ -17,7 +17,6 @@
 package com.nicoco007.jeuxdelaesd.events;
 
 import java.util.ArrayList;
-import java.util.logging.Handler;
 
 public class EventHandler<T> {
     private ArrayList<EventListener<T>> listeners = new ArrayList<>();

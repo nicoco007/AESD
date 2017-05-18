@@ -50,22 +50,20 @@
                 android:id="@+id/coordinates"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Chargement..."
-                android:layout_below="@+id/progressRing"
-                android:layout_centerHorizontal="true"
+                android:text="@string/loading"
                 android:visibility="gone"/>
 
             <TextView
                 android:id="@+id/status"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Chargement..."
+                android:text="@string/loading"
                 android:visibility="gone"/>
 
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Recherche de votre emplacement..."/>
+                android:text="@string/searching_for_location"/>
 
         </LinearLayout>
 

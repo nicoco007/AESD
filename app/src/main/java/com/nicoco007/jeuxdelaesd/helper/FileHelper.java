@@ -17,7 +17,6 @@
 package com.nicoco007.jeuxdelaesd.helper;
 
 import android.content.Context;
-import android.util.Log;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -40,7 +39,7 @@ public class FileHelper {
         if (inputStream != null) {
             InputStreamReader reader = new InputStreamReader(inputStream);
             BufferedReader bufferedReader = new BufferedReader(reader);
-            String line = "";
+            String line;
             StringBuilder stringBuilder = new StringBuilder();
 
             while ((line = bufferedReader.readLine()) != null) {

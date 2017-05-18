@@ -44,13 +44,6 @@ public class AesdActivity extends AppCompatActivity {
     protected DrawerLayout mDrawerLayout;
     protected ArrayList<NavItem> mNavItems = new ArrayList<>();
 
-    protected void onCreate(Bundle savedInstanceState) {
-
-        // just call super method
-        super.onCreate(savedInstanceState);
-
-    }
-
     protected void initDrawer() {
 
         // add navigation items
@@ -113,7 +106,7 @@ public class AesdActivity extends AppCompatActivity {
         };
 
         // set drawer listener
-        mDrawerLayout.setDrawerListener(mDrawerToggle);
+        mDrawerLayout.addDrawerListener(mDrawerToggle);
 
         // set action bar
         setSupportActionBar((Toolbar)findViewById(R.id.toolbar));

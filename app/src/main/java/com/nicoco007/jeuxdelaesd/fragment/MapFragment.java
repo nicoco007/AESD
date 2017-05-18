@@ -16,9 +16,7 @@
 
 package com.nicoco007.jeuxdelaesd.fragment;
 
-import android.app.Notification;
 import android.os.Bundle;
-import android.os.SystemClock;
 import android.support.v4.app.Fragment;
 import android.text.TextUtils;
 import android.util.Log;
@@ -41,7 +39,6 @@ import com.mapbox.mapboxsdk.maps.OnMapReadyCallback;
 import com.mapbox.services.android.telemetry.location.LocationEngine;
 import com.mapbox.services.android.telemetry.permissions.PermissionsListener;
 import com.mapbox.services.android.telemetry.permissions.PermissionsManager;
-
 import com.nicoco007.jeuxdelaesd.R;
 import com.nicoco007.jeuxdelaesd.events.EventListener;
 import com.nicoco007.jeuxdelaesd.events.LocationsUpdatedEventArgs;
@@ -53,11 +50,9 @@ import com.nicoco007.jeuxdelaesd.model.Location;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
-import org.joda.time.DateTime;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Random;
 
 public class MapFragment extends Fragment implements PermissionsListener {
 
@@ -177,35 +172,40 @@ public class MapFragment extends Fragment implements PermissionsListener {
         return self;
     }
 
-    private void onLocationsUpdated(LocationsUpdatedEventArgs result) {
+    private void onLocationsUpdated(final LocationsUpdatedEventArgs result) {
         if (!result.isSuccessful())
             return;
 
         // make sure we can actually modify the map
         if (map != null && isAdded()) {
 
-            // remove all markers
-            map.clear();
+            getActivity().runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    // remove all markers
+                    map.clear();
 
-            // iterate through locations
-            for (Location location : result.getLocations()) {
-                ArrayList<String> activityNames = new ArrayList<>();
+                    // iterate through locations
+                    for (Location location : result.getLocations()) {
+                        ArrayList<String> activityNames = new ArrayList<>();
 
-                for (Activity activity : location.getActivities())
-                    activityNames.add("\u2022 " + activity.getName());
+                        for (Activity activity : location.getActivities())
+                            activityNames.add("\u2022 " + activity.getName());
 
-                String snippet = TextUtils.join("\n", activityNames);
+                        String snippet = TextUtils.join("\n", activityNames);
 
-                LatLng pos = new LatLng(location.getLatitude(), location.getLongitude());
-                String title = location.getName();
+                        LatLng pos = new LatLng(location.getLatitude(), location.getLongitude());
+                        String title = location.getName();
 
-                MarkerOptions options = new MarkerOptions()
-                        .position(pos)
-                        .title(title)
-                        .snippet(snippet);
+                        MarkerOptions options = new MarkerOptions()
+                                .position(pos)
+                                .title(title)
+                                .snippet(snippet);
 
-                map.addMarker(options);
-            }
+                        map.addMarker(options);
+                    }
+                }
+            });
         }
     }
 

@@ -57,11 +57,6 @@ public class ScheduleFragment extends Fragment {
     public ScheduleFragment() { }
 
     @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-    }
-
-    @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         final View self = inflater.inflate(R.layout.fragment_schedule, container, false);
 

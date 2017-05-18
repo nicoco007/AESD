@@ -22,7 +22,7 @@
     android:layout_gravity="start">
 
     <!-- profile box -->
-    <RelativeLayout
+    <!-- <RelativeLayout
         android:id="@+id/profile_box"
         android:layout_width="match_parent"
         android:layout_height="100dp"
@@ -65,7 +65,7 @@
 
         </LinearLayout>
 
-    </RelativeLayout>
+    </RelativeLayout> -->
 
     <!-- pages -->
     <ListView

@@ -24,7 +24,6 @@ import android.support.annotation.NonNull;
 import android.support.v4.app.DialogFragment;
 import android.support.v7.app.AlertDialog;
 import android.util.Log;
-import android.util.TypedValue;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.Button;
@@ -33,18 +32,14 @@ import android.widget.Spinner;
 import android.widget.TextView;
 
 import com.nicoco007.jeuxdelaesd.R;
-import com.nicoco007.jeuxdelaesd.adapter.BuildingsListAdapter;
 import com.nicoco007.jeuxdelaesd.adapter.ResultsListAdapter;
 import com.nicoco007.jeuxdelaesd.adapter.SimpleSpinnerAdapter;
 import com.nicoco007.jeuxdelaesd.events.ShowMapCoordsEvent;
 import com.nicoco007.jeuxdelaesd.helper.NotificationHelper;
 import com.nicoco007.jeuxdelaesd.model.Activity;
-import com.nicoco007.jeuxdelaesd.model.Location;
-import com.nicoco007.jeuxdelaesd.model.Result;
 
 import org.greenrobot.eventbus.EventBus;
 import org.joda.time.DateTime;
-import org.joda.time.DateTimeZone;
 import org.joda.time.Interval;
 
 import java.util.ArrayList;
@@ -55,8 +50,6 @@ public class ActivityDialogFragment extends DialogFragment {
     private Activity item;
 
     private EventBus eventBus = EventBus.getDefault();
-
-    private ResultsListAdapter adapter;
 
     public ActivityDialogFragment() {}
 
@@ -90,7 +83,13 @@ public class ActivityDialogFragment extends DialogFragment {
             });
 
             TextView text = (TextView)dialogView.findViewById(R.id.dialog_activity_time);
-            text.setText(String.format(Locale.CANADA_FRENCH, getContext().getString(R.string.activity_time_text), item.getStartTime().getHourOfDay(), item.getStartTime().getMinuteOfHour(), item.getEndTime().getHourOfDay(), item.getEndTime().getMinuteOfHour()));
+            text.setText(getContext().getString(
+                    R.string.activity_time_text,
+                    item.getStartTime().getHourOfDay(),
+                    item.getStartTime().getMinuteOfHour(),
+                    item.getEndTime().getHourOfDay(),
+                    item.getEndTime().getMinuteOfHour()
+            ));
 
             Spinner spinner = (Spinner)dialogView.findViewById(R.id.dialog_activity_spinner);
 
@@ -106,22 +105,27 @@ public class ActivityDialogFragment extends DialogFragment {
             DateTime notificationTime = NotificationHelper.getNotificationDateTime(item.getName().hashCode());
 
             if (notificationTime != null) {
-                int definedTimeDiff = (int) new Interval(notificationTime, item.getStartTime()).toDuration().getStandardMinutes();
-                Log.i(TAG, String.valueOf(definedTimeDiff));
+                if (notificationTime.isBefore(item.getStartTime()) && notificationTime.isAfter(DateTime.now())) {
+                    int definedTimeDiff = (int) new Interval(notificationTime, item.getStartTime()).toDuration().getStandardMinutes();
+                    Log.i(TAG, String.valueOf(definedTimeDiff));
 
-                switch (definedTimeDiff) {
-                    case 30:
-                        spinner.setSelection(1);
-                        break;
-                    case 15:
-                        spinner.setSelection(2);
-                        break;
-                    case 10:
-                        spinner.setSelection(3);
-                        break;
-                    case 5:
-                        spinner.setSelection(4);
-                        break;
+                    switch (definedTimeDiff) {
+                        case 30:
+                            spinner.setSelection(1);
+                            break;
+                        case 15:
+                            spinner.setSelection(2);
+                            break;
+                        case 10:
+                            spinner.setSelection(3);
+                            break;
+                        case 5:
+                            spinner.setSelection(4);
+                            break;
+                    }
+                } else {
+                    Log.w(TAG, "Invalid alarm defined, cancelling");
+                    NotificationHelper.cancelNotification(getContext(), item.getName().hashCode());
                 }
             } else {
                 Log.i(TAG, "No defined alarm");
@@ -162,7 +166,7 @@ public class ActivityDialogFragment extends DialogFragment {
                 }
             });
 
-            adapter = new ResultsListAdapter(getContext(), item.getResults());
+            ResultsListAdapter adapter = new ResultsListAdapter(getContext(), item.getResults());
 
             ListView resultsListView = (ListView) dialogView.findViewById(R.id.dialog_list_view);
 

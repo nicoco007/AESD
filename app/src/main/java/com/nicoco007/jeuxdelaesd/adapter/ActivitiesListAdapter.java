@@ -28,13 +28,11 @@ import android.widget.Filterable;
 import android.widget.TextView;
 
 import com.nicoco007.jeuxdelaesd.R;
-import com.nicoco007.jeuxdelaesd.helper.NotificationHelper;
 import com.nicoco007.jeuxdelaesd.model.Activity;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import java.util.Locale;
 
 public class ActivitiesListAdapter extends ArrayAdapter<Activity> implements Filterable {
     private static final String TAG = "ActivitiesListAdapter";
@@ -101,9 +99,8 @@ public class ActivitiesListAdapter extends ArrayAdapter<Activity> implements Fil
 
         itemName.setText(item.getName());
 
-        itemTime.setText(String.format(
-                Locale.CANADA_FRENCH,
-                getContext().getString(R.string.activity_time),
+        itemTime.setText(getContext().getString(
+                R.string.activity_time,
                 item.getStartTime().getHourOfDay(),
                 item.getStartTime().getMinuteOfHour(),
                 item.getEndTime().getHourOfDay(),
