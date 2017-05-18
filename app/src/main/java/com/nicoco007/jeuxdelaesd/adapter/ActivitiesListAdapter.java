@@ -28,7 +28,8 @@ import android.widget.Filterable;
 import android.widget.TextView;
 
 import com.nicoco007.jeuxdelaesd.R;
-import com.nicoco007.jeuxdelaesd.onlinemodel.Activity;
+import com.nicoco007.jeuxdelaesd.helper.NotificationHelper;
+import com.nicoco007.jeuxdelaesd.model.Activity;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -108,6 +109,16 @@ public class ActivitiesListAdapter extends ArrayAdapter<Activity> implements Fil
                 item.getEndTime().getHourOfDay(),
                 item.getEndTime().getMinuteOfHour()
         ));
+
+        //if (NotificationHelper.getNotificationDateTime(item.getName().hashCode()) != null)
+        //    view.findViewById(R.id.lvia_image_timer).setVisibility(View.VISIBLE);
+        //else
+        //    view.findViewById(R.id.lvia_image_timer).setVisibility(View.INVISIBLE);
+
+        if (item.getResults().size() > 0)
+            view.findViewById(R.id.lvia_image_trophy).setVisibility(View.VISIBLE);
+        else
+            view.findViewById(R.id.lvia_image_trophy).setVisibility(View.INVISIBLE);
 
         return view;
     }

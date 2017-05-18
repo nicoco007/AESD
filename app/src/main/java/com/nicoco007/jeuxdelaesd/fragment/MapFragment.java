@@ -16,7 +16,9 @@
 
 package com.nicoco007.jeuxdelaesd.fragment;
 
+import android.app.Notification;
 import android.os.Bundle;
+import android.os.SystemClock;
 import android.support.v4.app.Fragment;
 import android.text.TextUtils;
 import android.util.Log;
@@ -45,13 +47,17 @@ import com.nicoco007.jeuxdelaesd.events.EventListener;
 import com.nicoco007.jeuxdelaesd.events.LocationsUpdatedEventArgs;
 import com.nicoco007.jeuxdelaesd.events.ShowMapCoordsEvent;
 import com.nicoco007.jeuxdelaesd.helper.APICommunication;
-import com.nicoco007.jeuxdelaesd.onlinemodel.Activity;
+import com.nicoco007.jeuxdelaesd.helper.NotificationHelper;
+import com.nicoco007.jeuxdelaesd.model.Activity;
+import com.nicoco007.jeuxdelaesd.model.Location;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
+import org.joda.time.DateTime;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 
 public class MapFragment extends Fragment implements PermissionsListener {
 
@@ -108,6 +114,15 @@ public class MapFragment extends Fragment implements PermissionsListener {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        NotificationHelper.loadNotifications(getContext());
+
+        Random random = new Random();
+
+        Notification notification = NotificationHelper.createNotification(getContext(), "THIS IS TITLE", "THIS IS CONTENT");
+        NotificationHelper.scheduleNotification(getContext(), notification, random.nextInt(Integer.MAX_VALUE), DateTime.now().getMillis() + 5 * 1000);
+
+        NotificationHelper.saveNotifications(getContext());
+        NotificationHelper.loadNotifications(getContext());
     }
 
     @Override
@@ -173,7 +188,7 @@ public class MapFragment extends Fragment implements PermissionsListener {
             map.clear();
 
             // iterate through locations
-            for (com.nicoco007.jeuxdelaesd.onlinemodel.Location location : result.getLocations()) {
+            for (Location location : result.getLocations()) {
                 ArrayList<String> activityNames = new ArrayList<>();
 
                 for (Activity activity : location.getActivities())
@@ -237,6 +252,7 @@ public class MapFragment extends Fragment implements PermissionsListener {
     public void onDestroy() {
         super.onDestroy();
         mapView.onDestroy();
+        NotificationHelper.saveNotifications(getContext());
     }
 
     @Override

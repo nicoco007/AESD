@@ -17,12 +17,15 @@
 package com.nicoco007.jeuxdelaesd.fragment;
 
 import android.app.Dialog;
+import android.app.Notification;
 import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.DialogFragment;
 import android.support.v7.app.AlertDialog;
+import android.util.Log;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.Spinner;
 import android.widget.TextView;
@@ -30,17 +33,20 @@ import android.widget.TextView;
 import com.nicoco007.jeuxdelaesd.R;
 import com.nicoco007.jeuxdelaesd.adapter.SimpleSpinnerAdapter;
 import com.nicoco007.jeuxdelaesd.events.ShowMapCoordsEvent;
-import com.nicoco007.jeuxdelaesd.onlinemodel.Activity;
+import com.nicoco007.jeuxdelaesd.helper.NotificationHelper;
+import com.nicoco007.jeuxdelaesd.model.Activity;
 
 import org.greenrobot.eventbus.EventBus;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
+import org.joda.time.Interval;
 
 import java.util.ArrayList;
 import java.util.Locale;
 
 public class ActivityDialogFragment extends DialogFragment {
 
+    private static final String TAG = "ActivityDialogFragment";
     private Activity item;
 
     private EventBus eventBus = EventBus.getDefault();
@@ -57,11 +63,6 @@ public class ActivityDialogFragment extends DialogFragment {
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
 
         if(item != null) {
-
-            DateTimeZone timeZone = DateTimeZone.getDefault();
-            DateTime localStartTime = new DateTime(item.getStartTime()).withZone(timeZone);
-            DateTime localEndTime = new DateTime(item.getEndTime()).withZone(timeZone);
-
             View dialogView = View.inflate(getContext(), R.layout.dialog_activity, null);
 
             Button button = (Button)dialogView.findViewById(R.id.dialog_activity_button);
@@ -82,7 +83,7 @@ public class ActivityDialogFragment extends DialogFragment {
             });
 
             TextView text = (TextView)dialogView.findViewById(R.id.dialog_activity_time);
-            text.setText(String.format(Locale.CANADA_FRENCH, getContext().getString(R.string.activity_time_text), localStartTime.getHourOfDay(), localStartTime.getMinuteOfHour(), localEndTime.getHourOfDay(), localEndTime.getMinuteOfHour()));
+            text.setText(String.format(Locale.CANADA_FRENCH, getContext().getString(R.string.activity_time_text), item.getStartTime().getHourOfDay(), item.getStartTime().getMinuteOfHour(), item.getEndTime().getHourOfDay(), item.getEndTime().getMinuteOfHour()));
 
             Spinner spinner = (Spinner)dialogView.findViewById(R.id.dialog_activity_spinner);
 
@@ -95,44 +96,71 @@ public class ActivityDialogFragment extends DialogFragment {
 
             spinner.setAdapter(new SimpleSpinnerAdapter(getContext(), spinnerItems));
 
-            /*spinner.setSelection(item.getRemindIndex());
+            DateTime notificationTime = NotificationHelper.getNotificationDateTime(item.getName().hashCode());
+
+            if (notificationTime != null) {
+                int definedTimeDiff = (int) new Interval(notificationTime, item.getStartTime()).toDuration().getStandardMinutes();
+                Log.i(TAG, String.valueOf(definedTimeDiff));
+
+                switch (definedTimeDiff) {
+                    case 30:
+                        spinner.setSelection(1);
+                        break;
+                    case 15:
+                        spinner.setSelection(2);
+                        break;
+                    case 10:
+                        spinner.setSelection(3);
+                        break;
+                    case 5:
+                        spinner.setSelection(4);
+                        break;
+                }
+            } else {
+                Log.i(TAG, "No defined alarm");
+            }
 
             spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
                 @Override
                 public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                    int notifId = item.getName().hashCode();
+                    Integer timeDiff = null;
+
                     switch(position) {
-                        case 0:
-                            item.clearNotification();
-                            break;
                         case 1:
-                            item.setNotification(30 * 60 * 1000);
+                            timeDiff = 30;
                             break;
                         case 2:
-                            item.setNotification(15 * 60 * 1000);
+                            timeDiff = 15;
                             break;
                         case 3:
-                            item.setNotification(10 * 60 * 1000);
+                            timeDiff = 10;
                             break;
                         case 4:
-                            item.setNotification(5 * 60 * 1000);
+                            timeDiff = 5;
                             break;
+                    }
+
+                    if (timeDiff != null) {
+                        Notification notification = NotificationHelper.createNotification(getContext(), "Activité imminente!", String.format(Locale.CANADA_FRENCH, "%s commence dans %d minutes!", item.getName(), timeDiff));
+                        NotificationHelper.scheduleNotification(getContext(), notification, notifId, item.getStartTime().minusMinutes(timeDiff).getMillis());
+                    } else {
+                        NotificationHelper.cancelNotification(getContext(), notifId);
                     }
                 }
 
                 @Override
                 public void onNothingSelected(AdapterView<?> parent) {
-
-                    item.clearNotification();
-
+                    NotificationHelper.cancelNotification(getContext(), item.getName().hashCode());
                 }
-            });*/
+            });
 
             builder.setView(dialogView);
 
             builder.setTitle(item.getName());
         } else {
             builder.setTitle("Woupelai");
-            builder.setMessage("Une erreur s'est produite.");
+            builder.setMessage("Une erreur s'est produite. Veuillez réessayer.");
         }
 
         builder.setPositiveButton("Fermer", new DialogInterface.OnClickListener() {

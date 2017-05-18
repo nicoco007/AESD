@@ -26,7 +26,7 @@ import android.widget.ArrayAdapter;
 import android.widget.TextView;
 
 import com.nicoco007.jeuxdelaesd.R;
-import com.nicoco007.jeuxdelaesd.onlinemodel.Location;
+import com.nicoco007.jeuxdelaesd.model.Location;
 
 import java.util.Collection;
 import java.util.List;

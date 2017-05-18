@@ -30,8 +30,8 @@ import com.nicoco007.jeuxdelaesd.events.EventListener;
 import com.nicoco007.jeuxdelaesd.events.LocationsUpdatedEventArgs;
 import com.nicoco007.jeuxdelaesd.events.ShowMapCoordsEvent;
 import com.nicoco007.jeuxdelaesd.helper.APICommunication;
-import com.nicoco007.jeuxdelaesd.onlinemodel.Location;
-import com.nicoco007.jeuxdelaesd.onlinemodel.LocationType;
+import com.nicoco007.jeuxdelaesd.model.Location;
+import com.nicoco007.jeuxdelaesd.model.LocationType;
 
 import org.greenrobot.eventbus.EventBus;
 

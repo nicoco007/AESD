@@ -14,26 +14,18 @@
  * limitations under the License.
  */
 
-package com.nicoco007.jeuxdelaesd.events;
+package com.nicoco007.jeuxdelaesd.model;
 
-import com.nicoco007.jeuxdelaesd.model.Location;
+public enum LocationType {
+    ACTIVITY (0), CAMP (1), OTHER (2);
 
-import java.util.ArrayList;
+    private final int id;
 
-public class LocationsUpdatedEventArgs {
-    private boolean successful;
-    private ArrayList<Location> locations;
-
-    public LocationsUpdatedEventArgs(boolean successful, ArrayList<Location> locations) {
-        this.successful = successful;
-        this.locations = locations;
+    LocationType(int id) {
+        this.id = id;
     }
 
-    public boolean isSuccessful() {
-        return successful;
-    }
-
-    public ArrayList<Location> getLocations() {
-        return locations;
+    public int getValue() {
+        return id;
     }
 }

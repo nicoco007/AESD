@@ -32,7 +32,7 @@
         android:textColor="#FF000000"
         android:id="@+id/lvia_activity"
         android:layout_alignParentStart="true"
-        android:layout_toStartOf="@+id/lvia_image_timer"/>
+        android:layout_toStartOf="@+id/lvia_image_trophy"/>
 
     <TextView
         android:layout_width="wrap_content"
@@ -40,14 +40,15 @@
         android:id="@+id/lvia_time"
         android:layout_below="@+id/lvia_activity"
         android:layout_alignParentStart="true"
-        android:layout_toStartOf="@+id/lvia_image_timer"/>
+        android:layout_toStartOf="@+id/lvia_image_trophy"/>
 
     <ImageView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:id="@+id/lvia_image_timer"
+        android:id="@+id/lvia_image_trophy"
         android:layout_centerVertical="true"
         android:layout_alignParentEnd="true"
-        android:src="@drawable/ic_alarm_gray_36dp" />
+        android:visibility="invisible"
+        android:src="@drawable/ic_trophy_36dp" />
 
 </RelativeLayout>

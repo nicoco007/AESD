@@ -21,7 +21,7 @@ import android.util.Log;
 
 import com.nicoco007.jeuxdelaesd.events.EventHandler;
 import com.nicoco007.jeuxdelaesd.events.LocationsUpdatedEventArgs;
-import com.nicoco007.jeuxdelaesd.onlinemodel.Location;
+import com.nicoco007.jeuxdelaesd.model.Location;
 
 import org.json.JSONArray;
 import org.json.JSONException;

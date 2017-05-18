@@ -39,8 +39,8 @@ import com.nicoco007.jeuxdelaesd.adapter.SimpleSpinnerAdapter;
 import com.nicoco007.jeuxdelaesd.events.EventListener;
 import com.nicoco007.jeuxdelaesd.events.LocationsUpdatedEventArgs;
 import com.nicoco007.jeuxdelaesd.helper.APICommunication;
-import com.nicoco007.jeuxdelaesd.onlinemodel.Activity;
-import com.nicoco007.jeuxdelaesd.onlinemodel.Location;
+import com.nicoco007.jeuxdelaesd.model.Activity;
+import com.nicoco007.jeuxdelaesd.model.Location;
 
 import java.text.Collator;
 import java.util.ArrayList;

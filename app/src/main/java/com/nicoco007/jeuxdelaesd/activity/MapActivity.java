@@ -87,17 +87,13 @@ public class MapActivity extends AesdActivity {
         // register EventBus
         EventBus eventBus = EventBus.getDefault();
         eventBus.register(this);
-
-
     }
 
     @Override
     public boolean dispatchTouchEvent(MotionEvent ev) {
-
         View v = getCurrentFocus();
 
         if ((ev.getAction() == MotionEvent.ACTION_UP || ev.getAction() == MotionEvent.ACTION_MOVE) && v instanceof EditText) {
-
             int viewCoords[] = new int[2];
             v.getLocationOnScreen(viewCoords);
             float x = ev.getRawX() + v.getLeft() - viewCoords[0];
@@ -105,11 +101,9 @@ public class MapActivity extends AesdActivity {
 
             if (x < v.getLeft() || x > v.getRight() || y < v.getTop() || y > v.getBottom())
                 hideKeyboard(this);
-
         }
 
         return super.dispatchTouchEvent(ev);
-
     }
 
     public static void hideKeyboard(Activity activity) {
@@ -121,10 +115,7 @@ public class MapActivity extends AesdActivity {
 
     @Subscribe
     public void onEvent(ShowMapCoordsEvent e) {
-
         // switch to map view
         viewPager.setCurrentItem(0);
-
     }
-
 }
