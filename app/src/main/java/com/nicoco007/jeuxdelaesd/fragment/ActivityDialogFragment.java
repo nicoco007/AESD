@@ -24,17 +24,23 @@ import android.support.annotation.NonNull;
 import android.support.v4.app.DialogFragment;
 import android.support.v7.app.AlertDialog;
 import android.util.Log;
+import android.util.TypedValue;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.Button;
+import android.widget.ListView;
 import android.widget.Spinner;
 import android.widget.TextView;
 
 import com.nicoco007.jeuxdelaesd.R;
+import com.nicoco007.jeuxdelaesd.adapter.BuildingsListAdapter;
+import com.nicoco007.jeuxdelaesd.adapter.ResultsListAdapter;
 import com.nicoco007.jeuxdelaesd.adapter.SimpleSpinnerAdapter;
 import com.nicoco007.jeuxdelaesd.events.ShowMapCoordsEvent;
 import com.nicoco007.jeuxdelaesd.helper.NotificationHelper;
 import com.nicoco007.jeuxdelaesd.model.Activity;
+import com.nicoco007.jeuxdelaesd.model.Location;
+import com.nicoco007.jeuxdelaesd.model.Result;
 
 import org.greenrobot.eventbus.EventBus;
 import org.joda.time.DateTime;
@@ -45,11 +51,12 @@ import java.util.ArrayList;
 import java.util.Locale;
 
 public class ActivityDialogFragment extends DialogFragment {
-
     private static final String TAG = "ActivityDialogFragment";
     private Activity item;
 
     private EventBus eventBus = EventBus.getDefault();
+
+    private ResultsListAdapter adapter;
 
     public ActivityDialogFragment() {}
 
@@ -154,6 +161,14 @@ public class ActivityDialogFragment extends DialogFragment {
                     NotificationHelper.cancelNotification(getContext(), item.getName().hashCode());
                 }
             });
+
+            adapter = new ResultsListAdapter(getContext(), item.getResults());
+
+            ListView resultsListView = (ListView) dialogView.findViewById(R.id.dialog_list_view);
+
+            resultsListView.setAdapter(adapter);
+
+            resultsListView.setEmptyView(dialogView.findViewById(R.id.dialog_list_view_empty));
 
             builder.setView(dialogView);
 

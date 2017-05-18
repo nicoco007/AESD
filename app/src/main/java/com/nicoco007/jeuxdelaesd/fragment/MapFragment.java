@@ -116,13 +116,13 @@ public class MapFragment extends Fragment implements PermissionsListener {
         super.onCreate(savedInstanceState);
         NotificationHelper.loadNotifications(getContext());
 
-        Random random = new Random();
+        /*Random random = new Random();
 
         Notification notification = NotificationHelper.createNotification(getContext(), "THIS IS TITLE", "THIS IS CONTENT");
         NotificationHelper.scheduleNotification(getContext(), notification, random.nextInt(Integer.MAX_VALUE), DateTime.now().getMillis() + 5 * 1000);
 
         NotificationHelper.saveNotifications(getContext());
-        NotificationHelper.loadNotifications(getContext());
+        NotificationHelper.loadNotifications(getContext());*/
     }
 
     @Override

@@ -43,6 +43,10 @@
     <string name="incompetence">Puisque l\'horaire officiel n\'a pas encore été publié, certaines informations sur l\'emplacement peuvent être erronées.</string>
     <string name="reset_map">Annuler ma sélection</string>
     <string name="click_to_show_on_map">Appuyez sur un lieu pour l\'afficher sur la carte.</string>
+    <string name="show_on_map">Afficher sur la carte</string>
     <string name="click_for_more_info">Appuyez sur une activité pour obtenir plus d\'information.</string>
     <string name="mapbox_access_token">pk.eyJ1Ijoibmljb2NvMDA3IiwiYSI6ImNqMmJhMWMyazAwdGoycW1wMWJwdG91ZXYifQ.zxh1qy9ELkyVzez79WWvBQ</string>
+    <string name="trophy">Trophée</string>
+    <string name="results">Résultats</string>
+    <string name="no_results">Aucun résultat publié.</string>
 </resources>

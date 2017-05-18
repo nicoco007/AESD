@@ -118,7 +118,7 @@ public class ActivitiesListAdapter extends ArrayAdapter<Activity> implements Fil
         if (item.getResults().size() > 0)
             view.findViewById(R.id.lvia_image_trophy).setVisibility(View.VISIBLE);
         else
-            view.findViewById(R.id.lvia_image_trophy).setVisibility(View.INVISIBLE);
+            view.findViewById(R.id.lvia_image_trophy).setVisibility(View.GONE);
 
         return view;
     }

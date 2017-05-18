@@ -48,7 +48,8 @@
         android:id="@+id/lvia_image_trophy"
         android:layout_centerVertical="true"
         android:layout_alignParentEnd="true"
-        android:visibility="invisible"
+        android:visibility="gone"
+        android:contentDescription="@string/trophy"
         android:src="@drawable/ic_trophy_36dp" />
 
 </RelativeLayout>
