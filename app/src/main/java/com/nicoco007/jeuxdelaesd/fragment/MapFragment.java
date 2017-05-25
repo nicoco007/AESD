@@ -86,15 +86,16 @@ public class MapFragment extends Fragment implements PermissionsListener {
 
     @Subscribe
     public void onShowMapCoordsEvent(ShowMapCoordsEvent event) {
-        map.deselectMarkers();
+        if (map != null) {
+            map.deselectMarkers();
 
-        for (Marker marker : map.getMarkers()) {
-            if (marker.getPosition().getLatitude() == event.getPosition().getLatitude() && marker.getPosition().getLongitude() == event.getPosition().getLongitude()) {
-                map.selectMarker(marker);
+            for (Marker marker : map.getMarkers()) {
+                if (marker.getPosition().getLatitude() == event.getPosition().getLatitude() && marker.getPosition().getLongitude() == event.getPosition().getLongitude()) {
+                    map.selectMarker(marker);
 
-                if (!map.getProjection().getVisibleRegion().latLngBounds.contains(marker.getPosition())) {
                     CameraPosition position = new CameraPosition.Builder()
                             .target(event.getPosition())
+                            .zoom(16)
                             .build();
 
                     map.moveCamera(CameraUpdateFactory.newCameraPosition(position));
