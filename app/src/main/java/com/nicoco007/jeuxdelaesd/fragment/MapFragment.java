@@ -183,12 +183,12 @@ public class MapFragment extends Fragment implements PermissionsListener {
                     try {
                         JSONObject jsonObject = new JSONObject(new String(offlineRegion.getMetadata(), JSON_CHARSET));
 
-                        final String id = jsonObject.getString(JSON_FIELD_REGION_ID);
-                        String name = jsonObject.getString(JSON_FIELD_REGION_NAME);
+                        final String id = jsonObject.has(JSON_FIELD_REGION_ID) ? jsonObject.getString(JSON_FIELD_REGION_ID) : null;
+                        final String name = jsonObject.has(JSON_FIELD_REGION_NAME) ? jsonObject.getString(JSON_FIELD_REGION_NAME) : null;
 
                         Log.i(TAG, String.format("Found region with ID \"%s\": %s", id, name));
 
-                        if (id.equals(regionId)) {
+                        if (id != null && id.equals(regionId)) {
                             found = true;
                             break;
                         } else {
