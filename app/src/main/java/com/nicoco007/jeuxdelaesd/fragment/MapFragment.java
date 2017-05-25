@@ -142,7 +142,6 @@ public class MapFragment extends Fragment implements PermissionsListener {
                 // doesnt work in options for some reason
                 map.setMinZoomPreference(15);
                 map.setMaxZoomPreference(18);
-                map.setMyLocationEnabled(true);
 
                 map.setLatLngBoundsForCameraTarget(new LatLngBounds.Builder().include(new LatLng(minLat, minLong)).include(new LatLng(maxLat, maxLong)).build());
 
@@ -299,12 +298,8 @@ public class MapFragment extends Fragment implements PermissionsListener {
     }
 
     private void onLocationsUpdated(final LocationsUpdatedEventArgs result) {
-        if (!result.isSuccessful())
-            return;
-
         // make sure we can actually modify the map
-        if (map != null && isAdded()) {
-
+        if (result.isSuccessful() && map != null && isAdded() && getContext() != null) {
             getActivity().runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
@@ -337,10 +332,14 @@ public class MapFragment extends Fragment implements PermissionsListener {
 
     @SuppressWarnings("MissingPermission")
     private void enableLocation() {
-        PermissionsManager permissionsManager = new PermissionsManager(this);
+        if (getContext() != null) {
+            PermissionsManager permissionsManager = new PermissionsManager(this);
 
-        if (!PermissionsManager.areLocationPermissionsGranted(getContext())) {
-            permissionsManager.requestLocationPermissions(getActivity());
+            if (!PermissionsManager.areLocationPermissionsGranted(getContext())) {
+                permissionsManager.requestLocationPermissions(getActivity());
+            } else {
+                map.setMyLocationEnabled(true);
+            }
         }
     }
 
