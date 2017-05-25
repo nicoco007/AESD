@@ -56,7 +56,7 @@
                 android:id="@+id/days"
                 android:paddingLeft="5dp"
                 android:paddingRight="5dp"
-                android:text="00"
+                android:text=""
                 android:textAppearance="?android:attr/textAppearanceLarge"
                 android:textSize="50sp"/>
             <TextView
@@ -82,7 +82,7 @@
                 android:id="@+id/hours"
                 android:paddingLeft="5dp"
                 android:paddingRight="5dp"
-                android:text="00"
+                android:text=""
                 android:textAppearance="?android:attr/textAppearanceLarge"
                 android:textSize="50sp"/>
             <TextView
@@ -108,7 +108,7 @@
                 android:id="@+id/minutes"
                 android:paddingLeft="5dp"
                 android:paddingRight="5dp"
-                android:text="00"
+                android:text=""
                 android:textAppearance="?android:attr/textAppearanceLarge"
                 android:textSize="50sp"/>
             <TextView
@@ -134,7 +134,7 @@
                 android:id="@+id/seconds"
                 android:paddingLeft="5dp"
                 android:paddingRight="5dp"
-                android:text="00"
+                android:text=""
                 android:textAppearance="?android:attr/textAppearanceLarge"
                 android:textSize="50sp"/>
             <TextView

@@ -130,6 +130,7 @@ public class NotificationHelper {
         }
     }
 
+    @SuppressWarnings("unchecked")
     public static void loadNotifications(Context context) {
         try {
             FileInputStream inputStream = context.openFileInput(NOTIFICATIONS_DATA_FILE_NAME);
