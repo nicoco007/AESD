@@ -23,10 +23,12 @@ import java.util.ArrayList;
 public class LocationsUpdatedEventArgs {
     private boolean successful;
     private ArrayList<Location> locations;
+    private boolean notifyOnError;
 
-    public LocationsUpdatedEventArgs(boolean successful, ArrayList<Location> locations) {
+    public LocationsUpdatedEventArgs(boolean successful, ArrayList<Location> locations, boolean notifyOnError) {
         this.successful = successful;
         this.locations = locations;
+        this.notifyOnError = notifyOnError;
     }
 
     public boolean isSuccessful() {
@@ -35,5 +37,9 @@ public class LocationsUpdatedEventArgs {
 
     public ArrayList<Location> getLocations() {
         return locations;
+    }
+
+    public boolean shouldNotifyOnError() {
+        return notifyOnError;
     }
 }

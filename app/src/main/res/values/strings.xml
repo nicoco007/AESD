@@ -40,7 +40,6 @@
     <string name="activity_time_text" formatted="false">De %02dh%02d à %02dh%02d</string>
     <string name="location_unavailable">Emplacement non disponible</string>
     <string name="sort_by">Trier par&#8230;</string>
-    <string name="incompetence">Puisque l\'horaire officiel n\'a pas encore été publié, certaines informations sur l\'emplacement peuvent être erronées.</string>
     <string name="reset_map">Annuler ma sélection</string>
     <string name="click_to_show_on_map">Appuyez sur un lieu pour l\'afficher sur la carte.</string>
     <string name="show_on_map">Afficher sur la carte</string>
@@ -51,4 +50,6 @@
     <string name="no_results">Aucun résultat publié.</string>
     <string name="loading">Chargement&#8230;</string>
     <string name="searching_for_location">Recherche de votre emplacement&#8230;</string>
+    <string name="countdown_activity_name">Décompte jusqu\'aux 14es Jeux de l\'AESD</string>
+    <string name="map_activity_name">Carte du camp Robin Hood</string>
 </resources>

@@ -39,7 +39,6 @@ import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 
 public class MapActivity extends AesdActivity {
-
     private AesdViewPager viewPager;
 
     @Override
@@ -87,6 +86,14 @@ public class MapActivity extends AesdActivity {
         // register EventBus
         EventBus eventBus = EventBus.getDefault();
         eventBus.register(this);
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+
+        // silent reload
+        APICommunication.loadLocations(this, true, false);
     }
 
     @Override

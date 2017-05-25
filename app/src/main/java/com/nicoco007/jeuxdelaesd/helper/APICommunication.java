@@ -17,6 +17,7 @@
 package com.nicoco007.jeuxdelaesd.helper;
 
 import android.content.Context;
+import android.support.annotation.NonNull;
 import android.util.Log;
 
 import com.nicoco007.jeuxdelaesd.events.EventHandler;
@@ -52,6 +53,8 @@ public class APICommunication {
 
     private static void initClient() {
         if (client == null) {
+            Log.i(TAG, "Initializing OkHttp Client");
+
             CookieManager manager = new CookieManager();
             manager.setCookiePolicy(CookiePolicy.ACCEPT_ALL);
 
@@ -61,23 +64,29 @@ public class APICommunication {
         }
     }
 
-    public static void loadLocations(final Context context) {
-        loadLocations(context, false);
-    }
-
     // TODO: this is to fix ConcurrentModificationException in MapFragment.onLocationsUpdated(), find better way of fixing
     private static boolean running = false;
 
+    public static void loadLocations(final Context context) {
+        loadLocations(context, false, true);
+    }
+
     public static void loadLocations(final Context context, final boolean forceRefresh) {
+        loadLocations(context, forceRefresh, true);
+    }
+
+    public static void loadLocations(final Context context, final boolean forceRefresh, final boolean notify) {
         if (running)
             return;
+
+        Log.i(TAG, "Loading locations");
 
         final String fileName = "locations.json";
 
         if (forceRefresh || locations.size() == 0) {
             running = true;
 
-            Log.d(TAG, "Loading locations");
+            Log.i(TAG, "Attempting to load locations from the Internet");
 
             initClient();
 
@@ -87,9 +96,9 @@ public class APICommunication {
 
             client.newCall(request).enqueue(new Callback() {
                 @Override
-                public void onFailure(Call call, IOException ex) {
+                public void onFailure(@NonNull Call call, @NonNull IOException ex) {
                     Log.w(TAG, "Failed to send request: " + ex.getMessage());
-                    Log.i(TAG, "Attempting to load cached data from file.");
+                    Log.i(TAG, "Attempting to load cached data from file");
 
                     boolean success = false;
 
@@ -118,19 +127,19 @@ public class APICommunication {
                         e.printStackTrace();
                     }
 
-                    onLocationsUpdatedEventHandler.raise(new LocationsUpdatedEventArgs(success, locations));
+                    onLocationsUpdatedEventHandler.raise(new LocationsUpdatedEventArgs(success, locations, notify));
 
                     running = false;
                 }
 
                 @Override
-                public void onResponse(Call call, Response response) throws IOException {
+                public void onResponse(@NonNull Call call, @NonNull Response response) throws IOException {
                     ResponseBody body = response.body();
 
                     boolean success = false;
 
                     if (response.isSuccessful() && body != null) {
-                        Log.w(TAG, "Request successful");
+                        Log.i(TAG, "Request successful");
 
                         try {
                             String responseBody = body.string();
@@ -158,13 +167,14 @@ public class APICommunication {
                         Log.e(TAG, String.format("Request succeeded but server responded with error code %d", response.code()));
                     }
 
-                    onLocationsUpdatedEventHandler.raise(new LocationsUpdatedEventArgs(success, locations));
+                    onLocationsUpdatedEventHandler.raise(new LocationsUpdatedEventArgs(success, locations, notify));
 
                     running = false;
                 }
             });
         } else {
-            onLocationsUpdatedEventHandler.raise(new LocationsUpdatedEventArgs(true, locations));
+            Log.i(TAG, "No update required, raising event");
+            onLocationsUpdatedEventHandler.raise(new LocationsUpdatedEventArgs(true, locations, notify));
         }
     }
 }

@@ -24,8 +24,8 @@ android {
         applicationId "com.nicoco007.jeuxdelaesd"
         minSdkVersion 19
         targetSdkVersion 25
-        versionCode 5
-        versionName "1.1.0"
+        versionCode 6
+        versionName "1.1.1"
     }
     /*signingConfigs {
         release {
@@ -63,7 +63,6 @@ dependencies {
     compile 'com.android.support:appcompat-v7:25.3.1'
     compile 'com.android.support:design:25.3.1'
     compile 'com.android.support:support-core-ui:25.3.1'
-    compile 'com.qozix:tileview:2.1.4'
     compile 'org.greenrobot:eventbus:3.0.0'
     compile 'joda-time:joda-time:2.3'
     compile 'com.squareup.okhttp3:okhttp:3.8.0'

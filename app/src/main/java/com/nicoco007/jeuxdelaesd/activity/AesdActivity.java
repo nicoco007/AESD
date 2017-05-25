@@ -37,36 +37,34 @@ import com.nicoco007.jeuxdelaesd.model.NavItem;
 import java.util.ArrayList;
 
 public class AesdActivity extends AppCompatActivity {
-
-    protected ListView mDrawerList;
-    protected RelativeLayout mDrawerPane;
-    protected ActionBarDrawerToggle mDrawerToggle;
-    protected DrawerLayout mDrawerLayout;
-    protected ArrayList<NavItem> mNavItems = new ArrayList<>();
+    protected ListView drawerList;
+    protected RelativeLayout drawerPane;
+    protected ActionBarDrawerToggle drawerToggle;
+    protected DrawerLayout drawerLayout;
+    protected ArrayList<NavItem> navItems = new ArrayList<>();
 
     protected void initDrawer() {
-
         // add navigation items
-        mNavItems.add(new NavItem(getString(R.string.title_activity_map), "Carte du camp Robin Hood", R.drawable.ic_map));
-        mNavItems.add(new NavItem(getString(R.string.title_activity_countdown), "Décompte jusqu'aux 13es jeux de l'AESD", R.drawable.ic_timer));
+        navItems.add(new NavItem(getString(R.string.title_activity_map), getString(R.string.map_activity_name), R.drawable.ic_map));
+        navItems.add(new NavItem(getString(R.string.title_activity_countdown), getString(R.string.countdown_activity_name), R.drawable.ic_timer));
 
         // get drawer pane
-        mDrawerPane = (RelativeLayout)findViewById(R.id.drawer_pane);
+        drawerPane = (RelativeLayout)findViewById(R.id.drawer_pane);
 
         // get drawer layout
-        mDrawerLayout = (DrawerLayout)mDrawerPane.getParent();
+        drawerLayout = (DrawerLayout)drawerPane.getParent();
 
         // get navigation list from drawer
-        mDrawerList = (ListView)findViewById(R.id.nav_list);
+        drawerList = (ListView)findViewById(R.id.nav_list);
 
         // create drawer adapter
-        DrawerListAdapter adapter = new DrawerListAdapter(this, mNavItems);
+        DrawerListAdapter adapter = new DrawerListAdapter(this, navItems);
 
         // set drawer adapter
-        mDrawerList.setAdapter(adapter);
+        drawerList.setAdapter(adapter);
 
         // create item click listener
-        mDrawerList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+        drawerList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
 
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
@@ -79,7 +77,7 @@ public class AesdActivity extends AppCompatActivity {
         });
 
         // create action bar toggle listener
-        mDrawerToggle = new ActionBarDrawerToggle(this, mDrawerLayout, R.string.drawer_open, R.string.drawer_close) {
+        drawerToggle = new ActionBarDrawerToggle(this, drawerLayout, R.string.drawer_open, R.string.drawer_close) {
 
             @Override
             public void onDrawerOpened(View drawerView) {
@@ -106,7 +104,7 @@ public class AesdActivity extends AppCompatActivity {
         };
 
         // set drawer listener
-        mDrawerLayout.addDrawerListener(mDrawerToggle);
+        drawerLayout.addDrawerListener(drawerToggle);
 
         // set action bar
         setSupportActionBar((Toolbar)findViewById(R.id.toolbar));
@@ -115,50 +113,42 @@ public class AesdActivity extends AppCompatActivity {
         if(getSupportActionBar() != null) {
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         }
-
     }
 
     @Override
     protected void onPostCreate(Bundle savedInstanceState) {
-
         super.onPostCreate(savedInstanceState);
-        mDrawerToggle.syncState();
-
+        drawerToggle.syncState();
     }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-
-        // inflate menu (this adds items to action bar)
+        // inflate menu (adds items to action bar)
         getMenuInflater().inflate(R.menu.menu_main, menu);
         return true;
-
     }
 
     /*@Override
     public boolean onPrepareOptionsMenu(Menu menu) {
-        boolean drawerOpen = mDrawerLayout.isDrawerOpen(mDrawerPane);
+        boolean drawerOpen = drawerLayout.isDrawerOpen(drawerPane);
         //menu.findItem(R.id.action_settings).setVisible(!drawerOpen);  // hide options when menu is open
         return super.onPrepareOptionsMenu(menu);
     }*/
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
+        return drawerToggle.onOptionsItemSelected(item);
 
-        return mDrawerToggle.onOptionsItemSelected(item);
-
-        /*if(mDrawerToggle.onOptionsItemSelected(item)) {
+        /*if(drawerToggle.onOptionsItemSelected(item)) {
             return true;
         }
 
         int id = item.getItemId();
 
         return id == R.id.action_settings || super.onOptionsItemSelected(item);*/
-
     }
 
     private void selectItem(int position) {
-
         Intent intent;
 
         switch(position) {
@@ -180,15 +170,12 @@ public class AesdActivity extends AppCompatActivity {
                 break;
         }
 
-        mDrawerList.setItemChecked(position, true);
-        mDrawerLayout.closeDrawer(mDrawerPane);
-
+        drawerList.setItemChecked(position, true);
+        drawerLayout.closeDrawer(drawerPane);
     }
 
     public void onConfigurationChanged(Configuration newConfig) {
-
         super.onConfigurationChanged(newConfig);
-        mDrawerToggle.onConfigurationChanged(newConfig);
-
+        drawerToggle.onConfigurationChanged(newConfig);
     }
 }

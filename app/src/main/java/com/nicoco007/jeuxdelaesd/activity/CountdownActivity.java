@@ -27,8 +27,7 @@ import com.nicoco007.jeuxdelaesd.helper.TimeHelper;
 import java.util.Locale;
 
 public class CountdownActivity extends AesdActivity {
-
-    private static final String GAMES_START_TIME = "2017-05-25 10:00:00 GMT-04:00";
+    private static final String GAMES_START_TIME = "2017-05-25 11:00:00 GMT-04:00";
 
     private CountDownTimer timer = null;
 

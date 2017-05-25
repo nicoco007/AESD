@@ -22,6 +22,7 @@ import android.support.v4.app.FragmentActivity;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -134,14 +135,16 @@ public class ScheduleFragment extends Fragment {
                 @Override
                 public void run() {
                     if (!result.isSuccessful()) {
-                        // TODO: shove in helper class
-                        Toast toast = Toast.makeText(getContext(), "Impossible de mettre à jour la liste d'activités. Veuillez vérifier votre connexion Internet puis réessayer.", Toast.LENGTH_LONG);
-                        TextView textView = (TextView) toast.getView().findViewById(android.R.id.message);
+                        if (result.shouldNotifyOnError()) {
+                            // TODO: shove in helper class
+                            Toast toast = Toast.makeText(getContext(), "Impossible de mettre à jour la liste d'activités. Veuillez vérifier votre connexion Internet puis réessayer.", Toast.LENGTH_LONG);
+                            TextView textView = (TextView) toast.getView().findViewById(android.R.id.message);
 
-                        if (textView != null)
-                            textView.setGravity(Gravity.CENTER);
+                            if (textView != null)
+                                textView.setGravity(Gravity.CENTER);
 
-                        toast.show();
+                            toast.show();
+                        }
 
                         refreshLayout.setRefreshing(false);
 
@@ -167,6 +170,8 @@ public class ScheduleFragment extends Fragment {
     private void sortActivities(int position) {
         switch (position) {
             case 0:
+                Log.i(TAG, "Sorting by time");
+
                 adapter.sort(new Comparator<Activity>() {
                     @Override
                     public int compare(Activity a, Activity b) {
@@ -183,7 +188,11 @@ public class ScheduleFragment extends Fragment {
                         }
                     }
                 });
+
+                break;
             case 1:
+                Log.i(TAG, "Sorting by name");
+
                 adapter.sort(new Comparator<Activity>() {
                     @Override
                     public int compare(Activity a, Activity b) {
@@ -192,6 +201,8 @@ public class ScheduleFragment extends Fragment {
                         return collator.compare(a.getName(), b.getName());
                     }
                 });
+
+                break;
         }
     }
 }

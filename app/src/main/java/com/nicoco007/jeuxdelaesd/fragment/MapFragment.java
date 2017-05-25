@@ -36,6 +36,11 @@ import com.mapbox.mapboxsdk.location.LocationSource;
 import com.mapbox.mapboxsdk.maps.MapView;
 import com.mapbox.mapboxsdk.maps.MapboxMap;
 import com.mapbox.mapboxsdk.maps.OnMapReadyCallback;
+import com.mapbox.mapboxsdk.offline.OfflineManager;
+import com.mapbox.mapboxsdk.offline.OfflineRegion;
+import com.mapbox.mapboxsdk.offline.OfflineRegionError;
+import com.mapbox.mapboxsdk.offline.OfflineRegionStatus;
+import com.mapbox.mapboxsdk.offline.OfflineTilePyramidRegionDefinition;
 import com.mapbox.services.android.telemetry.location.LocationEngine;
 import com.mapbox.services.android.telemetry.permissions.PermissionsListener;
 import com.mapbox.services.android.telemetry.permissions.PermissionsManager;
@@ -50,37 +55,29 @@ import com.nicoco007.jeuxdelaesd.model.Location;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
+import org.json.JSONException;
+import org.json.JSONObject;
 
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
 
 public class MapFragment extends Fragment implements PermissionsListener {
-
     public static final String TAG = "MapFragment";
 
     private MapView mapView;
     private MapboxMap map;
+    private OfflineManager offlineManager;
 
-    /**
-     * school
-     * 43.918942, -78.957837
-     * 43.916957, -78.955833
-     *
-     * robinhood2
-     * 43.927910, -79.221447
-     * 43.923517, -79.216322
-     */
-
-    //private static final double minLat = 43.899141;
-    //private static final double maxLat = 43.897313;
-    //private static final double minLong = -78.956643;
-    //private static final double maxLong = -78.954123;
-
-    // robinhood2
+    // robin hood
     private static final double minLat = 43.92336814129122;
     private static final double maxLat = 43.92806636084152;
     private static final double minLong = -79.22172546386719;
     private static final double maxLong = -79.21623229980469;
+
+    public static final Charset JSON_CHARSET = Charset.forName("UTF-8");
+    public static final String JSON_FIELD_REGION_ID = "field_region_id";
+    public static final String JSON_FIELD_REGION_NAME = "field_region_name";
 
     public MapFragment() {
         EventBus eventBus = EventBus.getDefault();
@@ -110,14 +107,6 @@ public class MapFragment extends Fragment implements PermissionsListener {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         NotificationHelper.loadNotifications(getContext());
-
-        /*Random random = new Random();
-
-        Notification notification = NotificationHelper.createNotification(getContext(), "THIS IS TITLE", "THIS IS CONTENT");
-        NotificationHelper.scheduleNotification(getContext(), notification, random.nextInt(Integer.MAX_VALUE), DateTime.now().getMillis() + 5 * 1000);
-
-        NotificationHelper.saveNotifications(getContext());
-        NotificationHelper.loadNotifications(getContext());*/
     }
 
     @Override
@@ -128,7 +117,7 @@ public class MapFragment extends Fragment implements PermissionsListener {
         Mapbox.getInstance(getContext(), getString(R.string.mapbox_access_token));
 
         // inflate view
-        View self = inflater.inflate(R.layout.fragment_map, container, false);
+        final View self = inflater.inflate(R.layout.fragment_map, container, false);
 
         // get location engine object for later use
         LocationEngine locationEngine = LocationSource.getLocationEngine(getContext());
@@ -159,6 +148,8 @@ public class MapFragment extends Fragment implements PermissionsListener {
                 enableLocation();
 
                 APICommunication.loadLocations(getContext());
+
+                checkOfflineRegions();
             }
         });
 
@@ -170,6 +161,140 @@ public class MapFragment extends Fragment implements PermissionsListener {
         });
 
         return self;
+    }
+
+    @SuppressWarnings("FieldCanBeLocal")
+    private final String regionName = "Camp Robin Hood";
+    private final String regionId = "Q2FtcCBSb2JpbiBIb29k";
+
+    private void checkOfflineRegions() {
+        // set up the offline manager
+        offlineManager = OfflineManager.getInstance(getContext());
+
+        offlineManager.listOfflineRegions(new OfflineManager.ListOfflineRegionsCallback() {
+            @Override
+            public void onList(OfflineRegion[] offlineRegions) {
+                Log.i(TAG, "Got list of offline regions");
+
+                boolean found = false;
+
+                for (OfflineRegion offlineRegion : offlineRegions) {
+                    try {
+                        JSONObject jsonObject = new JSONObject(new String(offlineRegion.getMetadata(), JSON_CHARSET));
+
+                        final String id = jsonObject.getString(JSON_FIELD_REGION_ID);
+                        String name = jsonObject.getString(JSON_FIELD_REGION_NAME);
+
+                        Log.i(TAG, String.format("Found region with ID \"%s\": %s", id, name));
+
+                        if (id.equals(regionId)) {
+                            found = true;
+                            break;
+                        } else {
+                            offlineRegion.delete(new OfflineRegion.OfflineRegionDeleteCallback() {
+                                @Override
+                                public void onDelete() {
+                                    Log.i(TAG, String.format("Successfully deleted region with ID \"%s\"", id));
+                                }
+
+                                @Override
+                                public void onError(String error) {
+                                    Log.e(TAG, String.format("Failed to delete region with ID \"%s\"", id));
+                                }
+                            });
+                        }
+                    } catch (JSONException ex) {
+                        Log.w(TAG, "Failed to parse metadata as JSON");
+                        ex.printStackTrace();
+                    }
+                }
+
+                if (!found) {
+                    Log.i(TAG, "Did not find required offline region");
+                    downloadOfflineRegions();
+                } else {
+                    Log.i(TAG, "Found required offline region");
+                }
+            }
+
+            @Override
+            public void onError(String error) {
+                Log.e(TAG, "Failed to list offline regions");
+            }
+        });
+    }
+
+    private void downloadOfflineRegions() {
+        Log.i(TAG, "Downloading offline regions");
+
+        // create a bounding box for the offline region
+        LatLngBounds latLngBounds = new LatLngBounds.Builder()
+                .include(new LatLng(minLat, minLong))
+                .include(new LatLng(maxLat, maxLong))
+                .build();
+
+        // define the offline region
+        final OfflineTilePyramidRegionDefinition definition = new OfflineTilePyramidRegionDefinition(
+                map.getStyleUrl(),
+                latLngBounds,
+                map.getMinZoomLevel(),
+                map.getMaxZoomLevel(),
+                getResources().getDisplayMetrics().density
+        );
+
+        // set the metadata
+        try {
+            JSONObject jsonObject = new JSONObject();
+
+            jsonObject.put(JSON_FIELD_REGION_ID, regionId);
+            jsonObject.put(JSON_FIELD_REGION_NAME, regionName);
+
+            String json = jsonObject.toString();
+            byte[] metadata = json.getBytes(JSON_CHARSET);
+
+            // create the region asynchronously
+            offlineManager.createOfflineRegion(
+                    definition,
+                    metadata,
+                    new OfflineManager.CreateOfflineRegionCallback() {
+                        @Override
+                        public void onCreate(OfflineRegion offlineRegion) {
+                            offlineRegion.setDownloadState(OfflineRegion.STATE_ACTIVE);
+
+                            offlineRegion.setObserver(new OfflineRegion.OfflineRegionObserver() {
+                                @Override
+                                public void onStatusChanged(OfflineRegionStatus status) {
+                                    double percentage = status.getRequiredResourceCount() >= 0 ? (100.0 * status.getCompletedResourceCount() / status.getRequiredResourceCount()) : 0.0;
+
+                                    if (status.isComplete()) {
+                                        Log.i(TAG, "Region downloaded successfully.");
+                                    } else if (status.isRequiredResourceCountPrecise()) {
+                                        Log.v(TAG, String.format("Downloading region: %d/%d resources (%.2f%%)", status.getCompletedResourceCount(), status.getRequiredResourceCount(), percentage));
+                                    }
+                                }
+
+                                @Override
+                                public void onError(OfflineRegionError error) {
+                                    Log.e(TAG, "onError reason: " + error.getReason());
+                                    Log.e(TAG, "onError message: " + error.getMessage());
+                                }
+
+                                @Override
+                                public void mapboxTileCountLimitExceeded(long limit) {
+                                    Log.e(TAG, "Mapbox tile count limit exceeded: " + limit);
+                                }
+                            });
+                        }
+
+                        @Override
+                        public void onError(String error) {
+                            Log.e(TAG, "Error: " + error);
+                        }
+                    }
+            );
+        } catch (JSONException ex) {
+            Log.e(TAG, "Failed to encode metadata: " + ex.getMessage());
+        }
     }
 
     private void onLocationsUpdated(final LocationsUpdatedEventArgs result) {

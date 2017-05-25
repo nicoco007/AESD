@@ -32,17 +32,18 @@ import com.nicoco007.jeuxdelaesd.model.Activity;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.List;
+import java.util.Collections;
+import java.util.Comparator;
 
 public class ActivitiesListAdapter extends ArrayAdapter<Activity> implements Filterable {
     private static final String TAG = "ActivitiesListAdapter";
 
-    private List<Activity> allItems;
-    private List<Activity> currentItems = new ArrayList<>();
+    private ArrayList<Activity> allItems;
+    private ArrayList<Activity> currentItems = new ArrayList<>();
 
     private final ActivitiesFilter filter = new ActivitiesFilter();
 
-    public ActivitiesListAdapter(Context context, List<Activity> list) {
+    public ActivitiesListAdapter(Context context, ArrayList<Activity> list) {
         super(context, 0, list);
 
         this.allItems = list;
@@ -78,6 +79,12 @@ public class ActivitiesListAdapter extends ArrayAdapter<Activity> implements Fil
     @Override
     public void clear() {
         allItems.clear();
+        filter.refresh();
+    }
+
+    @Override
+    public void sort(@NonNull Comparator<? super Activity> comparator) {
+        Collections.sort(allItems, comparator);
         filter.refresh();
     }
 
