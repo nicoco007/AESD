@@ -113,6 +113,7 @@ public class ScheduleFragment extends Fragment {
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 ActivityDialogFragment dialog = new ActivityDialogFragment();
                 dialog.setActivity(adapter.getItem(position));
+                dialog.setAdapter(adapter);
                 dialog.show(((FragmentActivity) getContext()).getSupportFragmentManager(), "ala_dialog_" + Long.toString(id));
             }
         });

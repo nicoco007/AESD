@@ -25,9 +25,11 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.Filter;
 import android.widget.Filterable;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.nicoco007.jeuxdelaesd.R;
+import com.nicoco007.jeuxdelaesd.helper.NotificationHelper;
 import com.nicoco007.jeuxdelaesd.model.Activity;
 
 import java.util.ArrayList;
@@ -103,6 +105,7 @@ public class ActivitiesListAdapter extends ArrayAdapter<Activity> implements Fil
 
         TextView itemName = (TextView)view.findViewById(R.id.lvia_activity);
         TextView itemTime = (TextView)view.findViewById(R.id.lvia_time);
+        ImageView timer = (ImageView)view.findViewById(R.id.lvia_image_timer);
 
         itemName.setText(item.getName());
 
@@ -114,10 +117,10 @@ public class ActivitiesListAdapter extends ArrayAdapter<Activity> implements Fil
                 item.getEndTime().getMinuteOfHour()
         ));
 
-        //if (NotificationHelper.getNotificationDateTime(item.getName().hashCode()) != null)
-        //    view.findViewById(R.id.lvia_image_timer).setVisibility(View.VISIBLE);
-        //else
-        //    view.findViewById(R.id.lvia_image_timer).setVisibility(View.INVISIBLE);
+        if (NotificationHelper.getNotificationDateTime(item.getName().hashCode()) != null)
+            timer.setAlpha(1.0f);
+        else
+            timer.setAlpha(0.2f);
 
         if (item.getResults().size() > 0)
             view.findViewById(R.id.lvia_image_trophy).setVisibility(View.VISIBLE);

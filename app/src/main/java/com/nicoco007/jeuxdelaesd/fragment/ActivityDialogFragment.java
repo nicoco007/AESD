@@ -26,7 +26,9 @@ import android.support.v7.app.AlertDialog;
 import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.Spinner;
 import android.widget.TextView;
@@ -48,6 +50,7 @@ import java.util.Locale;
 public class ActivityDialogFragment extends DialogFragment {
     private static final String TAG = "ActivityDialogFragment";
     private Activity item;
+    private ArrayAdapter adapter;
 
     private EventBus eventBus = EventBus.getDefault();
 
@@ -55,6 +58,10 @@ public class ActivityDialogFragment extends DialogFragment {
 
     public void setActivity(Activity item) {
         this.item = item;
+    }
+
+    public void setAdapter(ArrayAdapter adapter) {
+        this.adapter = adapter;
     }
 
     @Override
@@ -190,5 +197,11 @@ public class ActivityDialogFragment extends DialogFragment {
         });
 
         return builder.create();
+    }
+
+    @Override
+    public void onDismiss(DialogInterface dialog) {
+        super.onDismiss(dialog);
+        adapter.notifyDataSetChanged();
     }
 }

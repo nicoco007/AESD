@@ -32,7 +32,7 @@
         android:textColor="#FF000000"
         android:id="@+id/lvia_activity"
         android:layout_alignParentStart="true"
-        android:layout_toStartOf="@+id/lvia_image_trophy"/>
+        android:layout_toStartOf="@+id/lvia_images"/>
 
     <TextView
         android:layout_width="wrap_content"
@@ -40,16 +40,29 @@
         android:id="@+id/lvia_time"
         android:layout_below="@+id/lvia_activity"
         android:layout_alignParentStart="true"
-        android:layout_toStartOf="@+id/lvia_image_trophy"/>
+        android:layout_toStartOf="@+id/lvia_images"/>
 
-    <ImageView
+    <LinearLayout
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:id="@+id/lvia_image_trophy"
-        android:layout_centerVertical="true"
+        android:layout_height="match_parent"
         android:layout_alignParentEnd="true"
-        android:visibility="gone"
-        android:contentDescription="@string/trophy"
-        android:src="@drawable/ic_trophy_36dp" />
+        android:layout_centerVertical="true"
+        android:id="@+id/lvia_images">
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/lvia_image_trophy"
+            android:visibility="gone"
+            android:contentDescription="@string/trophy"
+            android:src="@drawable/ic_trophy_36dp" />
 
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/lvia_image_timer"
+            android:visibility="visible"
+            android:alpha="0.2"
+            android:contentDescription="@string/trophy"
+            android:src="@drawable/ic_timer" />
+    </LinearLayout>
 </RelativeLayout>
