@@ -24,10 +24,15 @@ import android.widget.Toast;
 import com.nicoco007.jeuxdelaesd.R;
 import com.nicoco007.jeuxdelaesd.helper.TimeHelper;
 
+import org.joda.time.DateTime;
+import org.joda.time.format.DateTimeFormat;
+import org.joda.time.format.DateTimeFormatter;
+import org.joda.time.format.ISODateTimeFormat;
+
 import java.util.Locale;
 
 public class CountdownActivity extends AesdActivity {
-    private static final String GAMES_START_TIME = "2017-05-25 11:00:00 GMT-04:00";
+    private static final String GAMES_START_TIME = "2018-05-24T11:00:00-04:00"; // TODO: fetch from server
 
     private CountDownTimer timer = null;
 
@@ -37,29 +42,36 @@ public class CountdownActivity extends AesdActivity {
         setContentView(R.layout.activity_countdown);
         super.initDrawer();
 
+        TextView textDate = (TextView)findViewById(R.id.textSubtitle);
+
+        DateTime dateTime = ISODateTimeFormat.dateTimeParser().parseDateTime(GAMES_START_TIME);
+        DateTimeFormatter formatter = DateTimeFormat.forPattern("yyyy-MM-dd");
+
+        textDate.setText(formatter.print(dateTime));
+
         long diff = 0;
 
+        final TextView textDays = (TextView)findViewById(R.id.days);
+        final TextView textHours = (TextView)findViewById(R.id.hours);
+        final TextView textMinutes = (TextView)findViewById(R.id.minutes);
+        final TextView textSeconds = (TextView)findViewById(R.id.seconds);
+
         try {
-            diff = TimeHelper.getUtcTimeDifference(GAMES_START_TIME);
+            diff = TimeHelper.getUtcTimeDifference(dateTime);
         } catch (Exception ex) {
             Toast.makeText(getApplicationContext(), ex.toString(), Toast.LENGTH_LONG).show();
         }
 
         if (timer == null) {
-            timer = new CountDownTimer(diff, 100) {
+            timer = new CountDownTimer(diff, 500) {
                 @Override
                 public void onTick(long millisUntilFinished) {
-                    TextView textDays = (TextView)findViewById(R.id.days);
-                    TextView textHours = (TextView)findViewById(R.id.hours);
-                    TextView textMinutes = (TextView)findViewById(R.id.minutes);
-                    TextView textSeconds = (TextView)findViewById(R.id.seconds);
-
                     long seconds = millisUntilFinished / 1000 % 60;
                     long minutes = millisUntilFinished / (1000 * 60) % 60;
                     long hours = millisUntilFinished / (1000 * 60 * 60) % 24;
                     long days = millisUntilFinished / (1000 * 60 * 60 * 24);
 
-                    textDays.setText(String.format(Locale.CANADA_FRENCH, "%02d", days));
+                    textDays.setText(String.format(Locale.CANADA_FRENCH, "%03d", days));
                     textHours.setText(String.format(Locale.CANADA_FRENCH, "%02d", hours));
                     textMinutes.setText(String.format(Locale.CANADA_FRENCH, "%02d", minutes));
                     textSeconds.setText(String.format(Locale.CANADA_FRENCH, "%02d", seconds));

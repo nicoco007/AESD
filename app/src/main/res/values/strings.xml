@@ -25,7 +25,6 @@
     <string name="cd_hours">heures</string>
     <string name="cd_minutes">minutes</string>
     <string name="cd_seconds">secondes</string>
-    <string name="games_date" tools:ignore="TypographyDashes">2017-05-25</string>
     <string name="time_sep">:</string>
     <string name="drawer_open">Open drawer</string>
     <string name="drawer_close">Close drawer</string>
@@ -50,7 +49,7 @@
     <string name="no_results">Aucun résultat publié.</string>
     <string name="loading">Chargement&#8230;</string>
     <string name="searching_for_location">Recherche de votre emplacement&#8230;</string>
-    <string name="countdown_activity_name">Décompte jusqu\'aux 14es Jeux de l\'AESD</string>
+    <string name="countdown_activity_name">Décompte jusqu\'aux Jeux de l\'AESD</string>
     <string name="map_activity_name">Carte du camp Robin Hood</string>
     <string name="default_content_description">icon</string>
 </resources>

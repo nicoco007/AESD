@@ -16,6 +16,9 @@
 
 package com.nicoco007.jeuxdelaesd.helper;
 
+import org.joda.time.DateTime;
+import org.joda.time.format.ISODateTimeFormat;
+
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -23,10 +26,8 @@ import java.util.Locale;
 import java.util.TimeZone;
 
 public class TimeHelper {
-    public static long getUtcTimeDifference(String date) throws ParseException {
-        Date enddate = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss zzz", Locale.CANADA_FRENCH).parse(date);
-
-        return enddate.getTime() - System.currentTimeMillis();
+    public static long getUtcTimeDifference(DateTime endDate) throws ParseException {
+        return endDate.getMillis() - System.currentTimeMillis();
     }
 
     public static long getUtcTimeDifference(long time) {
